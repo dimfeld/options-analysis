@@ -1,0 +1,43 @@
+Arguments: 
+  /usr/local/Cellar/node/8.7.0/bin/node /usr/local/Cellar/yarn/1.2.1/libexec/bin/yarn.js add lodash debug
+
+PATH: 
+  /Users/dimfeld/google-cloud-sdk/bin:/Users/dimfeld/bin/override:/usr/local/bin:/usr/local/sbin:/usr/local/share/python:/Users/dimfeld/.cargo/bin:/usr/local/go/bin:/Users/dimfeld/Library/Python/2.7/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/dimfeld/bin:/Users/dimfeld/Documents/go/bin
+
+Yarn version: 
+  1.2.1
+
+Node version: 
+  8.7.0
+
+Platform: 
+  darwin x64
+
+npm manifest: 
+  {
+    "name": "options-analyze",
+    "version": "1.0.0",
+    "description": "Utilities for analyzing option strategies",
+    "main": "dist/index.js",
+    "author": "Daniel Imfeld",
+    "license": "Apache-2.0"
+    "devDependencies": {
+      "@types/debug": "^0.0.30",
+      "@types/lodash": "^4.14.76"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  SyntaxError: /Users/dimfeld/Documents/projects/stakes/analyze/package.json: Unexpected string in JSON at position 199
+      at JSON.parse (<anonymous>)
+      at /usr/local/Cellar/yarn/1.2.1/libexec/lib/cli.js:770:59
+      at Generator.next (<anonymous>)
+      at step (/usr/local/Cellar/yarn/1.2.1/libexec/lib/cli.js:92:30)
+      at /usr/local/Cellar/yarn/1.2.1/libexec/lib/cli.js:103:13
+      at <anonymous>
