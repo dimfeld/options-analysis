@@ -62,34 +62,78 @@ export class PositionSimulator {
     }
 
     // If we get down to here, then it's closing a position.
-    let remaining = Math.abs(leg.size);
     let result : SimulationResults = [];
-    let newExisting = [];
+    let newExisting : OptionLeg[] = [];
+    const totalSize = _.sumBy(existing, 'size') - leg.size;
+
+    let remaining = leg.size;
+    let absRemaining = Math.abs(remaining);
+
     _.each(existing, (el) => {
       let absSize = Math.abs(el.size);
-      if(absSize >= remaining) {
-        // The new leg closes out this one.
+      if(absSize <= absRemaining) {
+        // The new leg completely closes out this one.
         result.push({
           affected: el,
           changedBy: leg,
           change: Change.Closed,
-          changeAmount: leg.size,
-          totalSize: _.sumBy(existing, 'size') - leg.size,
-          pnl: -(leg.price - el.price),
+          changeAmount: el.size,
+          totalSize,
+          pnl: (el.price - leg.price) * el.size,
         });
 
-        remaining -= absSize;
-      } else if(el.size !== 0) {
-        // The new leg partialy closes this one.
-        // TODO
+        remaining -= el.size;
+        absRemaining -= absSize;
+
+      } else if(absRemaining !== 0) {
+        // The new leg partially closes this one, so split it into two legs, one that is the closed portion and one that is the
+        // still-active portion.
+        el.size -= remaining;
+        newExisting.push(el);
+
+        let closedLeg = _.clone(el);
+        closedLeg.size = remaining;
+
+        result.push(
+          {
+            affected: el,
+            changedBy: leg,
+            change: Change.Reduced,
+            changeAmount: remaining,
+            totalSize,
+            pnl: null,
+          },
+          {
+            affected: closedLeg,
+            changedBy: leg,
+            change: Change.Closed,
+            changeAmount: remaining,
+            totalSize,
+            pnl: (el.price - leg.price) * remaining
+          },
+        );
+
+        remaining = absRemaining = 0;
+
       } else {
+        // No effect since the new leg has already been applied fully.
         newExisting.push(el);
       }
     });
 
-    if(remaining > 0) {
+    if(absRemaining > 0) {
       // This leg not only closed some positions, but opened new ones.
-      // TODO
+      let newLeg = _.clone(leg);
+      newLeg.size = remaining;
+
+      result.push({
+        affected: newLeg,
+        changedBy: leg,
+        change: Change.Opened,
+        changeAmount: newLeg.size,
+        totalSize,
+        pnl: null,
+      });
     }
 
     if(newExisting.length) {
