@@ -29,6 +29,19 @@ export class PositionSimulator {
 
   legs : {[key:string]: OptionLeg[]};
 
+  constructor(initial? : OptionLeg[]) {
+    this.legs = {};
+    _.each(initial, (leg) => {
+      let symbol = fullSymbol(leg);
+      let list = this.legs[symbol];
+      if(list) {
+        list.push(leg);
+      } else {
+        this.legs[symbol] = [leg];
+      }
+    });
+  }
+
   addLegs(legs : OptionLeg[]) : SimulationResults {
     return _.flatMap(legs, (leg) => {
       let symbol = fullSymbol(leg);
