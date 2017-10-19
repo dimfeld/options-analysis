@@ -142,8 +142,9 @@ export function classify(legs : OptionLeg[]) {
   let expiration = legs[0].expiration;
   let size = legs[0].size;
 
-  let allSameExpiration = _.every(legs.slice(1), (leg) => leg.expiration === expiration);
-  let allSameSize = _.every(legs.slice(1), (leg) => leg.size === size);
+  let otherLegs = legs.slice(1);
+  let allSameExpiration = _.every(otherLegs, (leg) => leg.expiration === expiration);
+  let allSameSize = _.every(otherLegs, (leg) => leg.size === size);
   if(!allSameExpiration || !allSameSize) {
     // Different expirations or sizes. Look for calendars, ratios, etc.
     return null;
