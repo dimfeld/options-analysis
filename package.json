@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Utilities for analyzing option strategies",
   "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "tsc": "tsc -p .",
     "postinstall": "tsc"
