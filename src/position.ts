@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { OptionLeg, fullSymbol } from './types';
+import * as uuid from 'uuid';
 
 enum Change {
   // The leg in `changedBy` closed the affected leg.
@@ -20,6 +21,7 @@ export interface SimulationStep {
   changeAmount : number;
   totalSize: number;
   pnl? : number;
+  created: boolean;
 }
 
 export type SimulationResults = SimulationStep[];
@@ -50,6 +52,10 @@ export class PositionSimulator {
   }
 
   addLegbyFullSymbol(fullSymbol : string, leg : OptionLeg) : SimulationResults {
+    if(!leg.id) {
+      leg.id = uuid.v1();
+    }
+
     let existing = this.legs[fullSymbol];
     if(!existing || !existing.length) {
       this.legs[fullSymbol] = [leg];
@@ -59,6 +65,7 @@ export class PositionSimulator {
         change: Change.Opened,
         changeAmount: leg.size,
         totalSize: leg.size,
+        created: true,
         pnl: 0, // Never any P&L on an opening.
       }];
     } else if(existing[0].size * leg.size > 0) {
@@ -70,6 +77,7 @@ export class PositionSimulator {
         change: Change.Opened,
         changeAmount: leg.size,
         totalSize: _.sumBy(existing, 'size'),
+        created: true,
         pnl: 0,
       }];
     }
@@ -92,6 +100,7 @@ export class PositionSimulator {
           change: Change.Closed,
           changeAmount: el.size,
           totalSize,
+          created: false,
           pnl: (el.price - leg.price) * el.size,
         });
 
@@ -104,8 +113,10 @@ export class PositionSimulator {
         el.size -= remaining;
         newExisting.push(el);
 
+        // The closed leg should be the newly created object, so that the one that remains in the system is the same leg that was originally added.
         let closedLeg = _.clone(el);
         closedLeg.size = remaining;
+        closedLeg.id = uuid.v1();
 
         result.push(
           {
@@ -114,6 +125,7 @@ export class PositionSimulator {
             change: Change.Reduced,
             changeAmount: remaining,
             totalSize,
+            created: false,
             pnl: null,
           },
           {
@@ -122,7 +134,8 @@ export class PositionSimulator {
             change: Change.Closed,
             changeAmount: remaining,
             totalSize,
-            pnl: (el.price - leg.price) * remaining
+            created: true,
+            pnl: (el.price - leg.price) * remaining,
           },
         );
 
@@ -138,6 +151,7 @@ export class PositionSimulator {
       // This leg not only closed some positions, but opened new ones.
       let newLeg = _.clone(leg);
       newLeg.size = remaining;
+      newLeg.id = uuid.v1();
 
       result.push({
         affected: newLeg,
@@ -145,6 +159,7 @@ export class PositionSimulator {
         change: Change.Opened,
         changeAmount: newLeg.size,
         totalSize,
+        created: true,
         pnl: null,
       });
     }

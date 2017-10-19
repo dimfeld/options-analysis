@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 
 export interface OptionLeg {
+  id? : string;
   symbol : string;
   strike : number;
   expiration: string;
