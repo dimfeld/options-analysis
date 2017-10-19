@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Utilities for analyzing option strategies",
   "main": "dist/index.js",
+  "scripts": {
+    "tsc": "tsc -p .",
+    "postinstall": "tsc"
+  },
   "author": "Daniel Imfeld",
   "license": "Apache-2.0",
   "devDependencies": {
