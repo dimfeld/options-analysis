@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { OptionLeg, fullSymbol } from './types';
 import * as uuid from 'uuid';
 
-enum Change {
+export enum Change {
   // The leg in `changedBy` closed the affected leg.
   Closed,
 
