@@ -26,7 +26,7 @@ export interface SimulationStep {
 
 export type SimulationResults = SimulationStep[];
 
-// Simulate executions and their effect on a portfolio. This accounts for
+// Simulate executions and their effect on a portfolio.
 export class PositionSimulator {
 
   legs : {[key:string]: OptionLeg[]};
@@ -85,7 +85,7 @@ export class PositionSimulator {
     // If we get down to here, then it's closing a position.
     let result : SimulationResults = [];
     let newExisting : OptionLeg[] = [];
-    const totalSize = _.sumBy(existing, 'size') - leg.size;
+    let totalSize = _.sumBy(existing, 'size') + leg.size;
 
     let remaining = leg.size;
     let absRemaining = Math.abs(remaining);
@@ -98,10 +98,10 @@ export class PositionSimulator {
           affected: el,
           changedBy: leg,
           change: Change.Closed,
-          changeAmount: el.size,
+          changeAmount: -el.size,
           totalSize,
           created: false,
-          pnl: (el.price - leg.price) * el.size,
+          pnl: (leg.price - el.price) * el.size,
         });
 
         remaining -= el.size;
