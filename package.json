@@ -6,13 +6,20 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "tsc": "tsc -p .",
-    "postinstall": "tsc"
+    "postinstall": "tsc",
+    "test": "mocha --opts mocha.opts"
   },
   "author": "Daniel Imfeld",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/chai": "^4.0.4",
     "@types/debug": "^0.0.30",
-    "@types/lodash": "^4.14.76"
+    "@types/lodash": "^4.14.76",
+    "@types/mocha": "^2.2.43",
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.5.3"
   },
   "dependencies": {
     "debug": "^3.1.0",
