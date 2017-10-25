@@ -110,12 +110,12 @@ export class PositionSimulator {
       } else if(absRemaining !== 0) {
         // The new leg partially closes this one, so split it into two legs, one that is the closed portion and one that is the
         // still-active portion.
-        el.size -= remaining;
+        el.size += remaining;
         newExisting.push(el);
 
         // The closed leg should be the newly created object, so that the one that remains in the system is the same leg that was originally added.
         let closedLeg = _.clone(el);
-        closedLeg.size = remaining;
+        closedLeg.size = -remaining;
         closedLeg.id = uuid.v1();
 
         result.push(
