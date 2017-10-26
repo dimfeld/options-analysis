@@ -307,10 +307,10 @@ describe("simulator", function() {
     assert.notEqual(result[1].affected.id, legs[1].id, 'new leg object gets new id')
     assert.isOk(result[1].affected.id, 'new leg object gets new id');
     result[1].affected.id = 'newid'; // Set it to something known for the assert below.
-    let reducedLeg = _.extend({}, legs[1], { size: -2 });
+    let reducedShort = _.extend({}, legs[1], { size: -2 });
     let expected = [
       {
-        affected: reducedLeg,
+        affected: reducedShort,
         changedBy: closingLegs[0],
         change: position.Change.Reduced,
         changeAmount: 1,
@@ -331,23 +331,37 @@ describe("simulator", function() {
     ];
 
     assert.deepEqual(result, expected, 'partial close short leg');
-    checkSimState(sim, [reducedLeg, legs[0]], 'sim state after close');
+    checkSimState(sim, [reducedShort, legs[0]], 'sim state after closing short');
 
-    // result = sim.addLegs([closingLegs[1]]);
-    // expected = [
-    //   {
-    //     affected: legs[0],
-    //     changedBy: closingLegs[1],
-    //     change: position.Change.Closed,
-    //     changeAmount: -2,
-    //     totalSize: 0,
-    //     created: false,
-    //     pnl: (legs[0].price - closingLegs[1].price) * -2,
-    //   }
-    // ];
+    result = sim.addLegs([closingLegs[1]]);
+    assert.notEqual(result[1].affected.id, legs[0].id, 'new leg object gets new id')
+    assert.isOk(result[1].affected.id, 'new leg object gets new id');
+    result[1].affected.id = 'newid'; // Set it to something known for the assert below.
+    let reducedLong = _.extend({}, legs[0], { size: 2 });
+    expected = [
+      {
+        affected: reducedLong,
+        changedBy: closingLegs[1],
+        change: position.Change.Reduced,
+        changeAmount: -1,
+        totalSize: 2,
+        created: false,
+        pnl: null,
 
-    // assert.deepEqual(result, expected, 'closing long leg');
-    // checkSimState(sim, [], 'sim state after close');
+      },
+      {
+        affected: _.extend({}, legs[0], { size: 1, id: 'newid' }),
+        changedBy: closingLegs[1],
+        change: position.Change.Closed,
+        changeAmount: -1,
+        totalSize: 2,
+        created: true,
+        pnl: (closingLegs[1].price - legs[0].price),
+      }
+    ];
+
+    assert.deepEqual(result, expected, 'partial close long leg');
+    checkSimState(sim, [reducedShort, reducedLong], 'sim state after closing long');
   });
 
   it("rolling");
