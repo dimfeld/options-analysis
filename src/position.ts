@@ -101,7 +101,7 @@ export class PositionSimulator {
           changeAmount: -el.size,
           totalSize,
           created: false,
-          pnl: (leg.price - el.price) * el.size,
+          pnl: (el.price - leg.price) * el.size,
         });
 
         remaining -= el.size;

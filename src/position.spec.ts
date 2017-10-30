@@ -232,7 +232,7 @@ describe("simulator", function() {
         changeAmount: 2,
         totalSize: 0,
         created: false,
-        pnl: (legs[1].price - closingLegs[0].price) * 2,
+        pnl: (closingLegs[0].price - legs[1].price) * 2,
       },
     ];
 
@@ -248,7 +248,7 @@ describe("simulator", function() {
         changeAmount: -2,
         totalSize: 0,
         created: false,
-        pnl: (legs[0].price - closingLegs[1].price) * -2,
+        pnl: (closingLegs[1].price - legs[0].price) * -2,
       }
     ];
 
@@ -364,7 +364,114 @@ describe("simulator", function() {
     checkSimState(sim, [reducedShort, reducedLong], 'sim state after closing long');
   });
 
-  it("rolling");
+  it("rolling", function() {
+    let initialState = [
+      {
+        id: 'longStrike',
+        symbol: 'ANET',
+        strike: 180,
+        expiration: '171020',
+        call: false,
+        size: 3,
+        price: 4.35,
+      },
+      {
+        id: 'shortStrike',
+        symbol: 'ANET',
+        strike: 170,
+        expiration: '171020',
+        call: false,
+        size: -3,
+        price: 4.35,
+      },
+    ];
+
+    let sim = new position.PositionSimulator(initialState);
+    checkSimState(sim, initialState, 'initial sim state');
+
+    let rolling = [
+      {
+        id: 'closeLong',
+        symbol: 'ANET',
+        strike: 180,
+        expiration: '171020',
+        call: false,
+        size: -3,
+        price: 3.27,
+      },
+      {
+        id: 'closeShort',
+        symbol: 'ANET',
+        strike: 170,
+        expiration: '171020',
+        call: false,
+        size: 3,
+        price: 3.15,
+      },
+      {
+        id: 'newLong',
+        symbol: 'ANET',
+        strike: 180,
+        expiration: '171117',
+        call: false,
+        size: 3,
+        price: 4.15,
+      },
+      {
+        id: 'newShort',
+        symbol: 'ANET',
+        strike: 170,
+        expiration: '171117',
+        call: false,
+        size: -3,
+        price: 4.10,
+      },
+    ];
+
+    let result = sim.addLegs(rolling);
+    let expectedResult = [
+      {
+        affected: initialState[0],
+        changedBy: rolling[0],
+        change: position.Change.Closed,
+        changeAmount: -3,
+        totalSize: 0,
+        pnl: (4.35-3.27)*3,
+        created: false,
+      },
+      {
+        affected: initialState[1],
+        changedBy: rolling[1],
+        change: position.Change.Closed,
+        changeAmount: 3,
+        totalSize: 0,
+        pnl: (3.15-4.35)*3,
+        created: false,
+      },
+      {
+        affected: rolling[2],
+        changedBy: rolling[2],
+        change: position.Change.Opened,
+        changeAmount: 3,
+        totalSize: 3,
+        pnl: 0,
+        created: true,
+      },
+      {
+        affected: rolling[3],
+        changedBy: rolling[3],
+        change: position.Change.Opened,
+        changeAmount: -3,
+        totalSize: -3,
+        pnl: 0,
+        created: true,
+      },
+    ];
+
+    assert.deepEqual(result, expectedResult, 'sim result');
+    checkSimState(sim, [rolling[2], rolling[3]], 'only opened legs are present');
+  });
+
   it("closing short and opening long at same strike");
   it("closing long and opening short at same strike");
   it("single list of options modifies the same one multiple times");
