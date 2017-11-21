@@ -6,7 +6,7 @@ export interface OptionLeg {
   strike : number;
   expiration: string;
   call : boolean;
-  size : number;
+  size? : number;
   price? : number;
 }
 
