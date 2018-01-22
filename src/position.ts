@@ -34,7 +34,7 @@ export class PositionSimulator {
   constructor(initial? : OptionLeg[]) {
     this.legs = {};
     _.each(initial, (leg) => {
-      let symbol = fullSymbol(leg);
+      let symbol = leg.symbol;
       let list = this.legs[symbol];
       if(list) {
         list.push(leg);
@@ -45,20 +45,18 @@ export class PositionSimulator {
   }
 
   addLegs(legs : OptionLeg[]) : SimulationResults {
-    return _.flatMap(legs, (leg) => {
-      let symbol = fullSymbol(leg);
-      return this.addLegbyFullSymbol(symbol, leg);
-    });
+    return _.flatMap(legs, (leg) => this.addLeg(leg));
   }
 
-  addLegbyFullSymbol(fullSymbol : string, leg : OptionLeg) : SimulationResults {
+  addLeg(leg : OptionLeg) : SimulationResults {
     if(!leg.id) {
       leg.id = uuid.v1();
     }
 
-    let existing = this.legs[fullSymbol];
+    let symbol = leg.symbol;
+    let existing = this.legs[symbol];
     if(!existing || !existing.length) {
-      this.legs[fullSymbol] = [leg];
+      this.legs[symbol] = [leg];
       return [{
         affected: leg,
         changedBy: leg,
@@ -164,13 +162,7 @@ export class PositionSimulator {
       });
     }
 
-    if(newExisting.length) {
-      this.legs[fullSymbol] = newExisting;
-    } else {
-      this.legs[fullSymbol] = undefined;
-    }
-
-
+    this.legs[symbol] = newExisting.length ? newExisting : undefined;
     return result;
   }
 }

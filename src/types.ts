@@ -3,11 +3,17 @@ import * as _ from 'lodash';
 export interface OptionLeg {
   id? : string;
   symbol : string;
-  strike : number;
-  expiration: string;
-  call : boolean;
   size? : number;
   price? : number;
+}
+
+export interface OptionInfo {
+  id? : string;
+  underlying: string;
+  strike: number;
+  expiration: string;
+  call: boolean;
+  size? : number;
 }
 
 export function occExpirationFromDate(d : Date) {
@@ -17,14 +23,41 @@ export function occExpirationFromDate(d : Date) {
   return `${year}${month}${day}`;
 }
 
-export function fullSymbol(ol: OptionLeg, padSymbol=true) {
+export function fullSymbol(ol: OptionInfo, padSymbol=true) {
   if(!_.isNil(ol.call) && ol.strike) {
     let legType = ol.call ? 'C' : 'P';
     let strike = _.padStart((ol.strike * 1000).toString(), 8, '0').slice(0, 8);
-    let symbol = padSymbol ? _.padEnd(ol.symbol, 6, ' ') : ol.symbol;
+    let symbol = padSymbol ? _.padEnd(ol.underlying, 6, ' ') : ol.underlying;
     return `${symbol}${ol.expiration}${legType}${strike}`;
   } else {
     // Otherwise it's just an equity.
-    return ol.symbol;
+    return ol.underlying;
   }
+}
+
+export function optionInfoFromSymbol(symbol : string) : OptionInfo {
+  let underlying = symbol.slice(0, 6).trim();
+  if(symbol.length <= 6) {
+    return {
+      underlying,
+      expiration: undefined,
+      call: undefined,
+      strike: undefined,
+    };
+  }
+
+  return {
+    underlying,
+    expiration: symbol.slice(6, 12),
+    call: symbol[12] === 'C',
+    strike: +_.trimStart(symbol.slice(13)) / 1000,
+  };
+}
+
+export function optionInfoFromLeg(leg : OptionLeg) : OptionInfo {
+  return {
+    id: leg.id,
+    size: leg.size,
+    ...optionInfoFromSymbol(leg.symbol),
+  };
 }

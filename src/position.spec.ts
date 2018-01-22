@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 
 function expectedLegs(legs : OptionLeg[]) {
   return _.transform(legs, (memo, leg) => {
-    let fs = fullSymbol(leg);
+    let fs = leg.symbol;
     let list = memo[fs] as OptionLeg[];
     if(list) {
       list.push(leg);
@@ -31,10 +31,7 @@ describe("simulator", function() {
     let sim = new position.PositionSimulator();
     let leg = {
       id: 'abc',
-      symbol: 'ANET',
-      strike: 180,
-      expiration: '171020',
-      call: false,
+      symbol: 'ANET  171020P00180000',
       size: 2,
       price: 4.35,
     };
@@ -60,19 +57,13 @@ describe("simulator", function() {
     let legs = [
       {
         id: 'abc',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00180000',
         size: 2,
         price: 4.35,
       },
       {
         id: 'def',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00170000',
         size: -2,
         price: 4.35,
       }
@@ -109,19 +100,13 @@ describe("simulator", function() {
     let legs = [
       {
         id: 'abc',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00180000',
         size: 2,
         price: 4.35,
       },
       {
         id: 'def',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00170000',
         size: -2,
         price: 4.35,
       },
@@ -133,19 +118,13 @@ describe("simulator", function() {
     let newLegs = [
       {
         id: 'aaa',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00180000',
         size: 2,
         price: 4.35,
       },
       {
         id: 'bbb',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00170000',
         size: -2,
         price: 4.35,
       },
@@ -181,19 +160,13 @@ describe("simulator", function() {
     let legs = [
       {
         id: 'longStrike',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00180000',
         size: 2,
         price: 4.35,
       },
       {
         id: 'shortStrike',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00170000',
         size: -2,
         price: 4.35,
       },
@@ -205,19 +178,13 @@ describe("simulator", function() {
     let closingLegs = [
       {
         id: 'closingShortStrike',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00170000',
         size: 2,
         price: 2.45,
       },
       {
         id: 'closingLongStrike',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00180000',
         size: -2,
         price: 2.45,
       },
@@ -261,19 +228,13 @@ describe("simulator", function() {
     let legs = [
       {
         id: 'longStrike',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00180000',
         size: 3,
         price: 4.35,
       },
       {
         id: 'shortStrike',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00170000',
         size: -3,
         price: 4.35,
       },
@@ -285,19 +246,13 @@ describe("simulator", function() {
     let closingLegs = [
       {
         id: 'closingShortStrike',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00170000',
         size: 1,
         price: 2.45,
       },
       {
         id: 'closingLongStrike',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00180000',
         size: -1,
         price: 2.45,
       },
@@ -368,19 +323,13 @@ describe("simulator", function() {
     let initialState = [
       {
         id: 'longStrike',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00180000',
         size: 3,
         price: 4.35,
       },
       {
         id: 'shortStrike',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00170000',
         size: -3,
         price: 4.35,
       },
@@ -392,37 +341,26 @@ describe("simulator", function() {
     let rolling = [
       {
         id: 'closeLong',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00180000',
         size: -3,
         price: 3.27,
       },
       {
         id: 'closeShort',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171020',
-        call: false,
+        symbol: 'ANET  171020P00170000',
         size: 3,
         price: 3.15,
       },
       {
         id: 'newLong',
-        symbol: 'ANET',
-        strike: 180,
-        expiration: '171117',
+        symbol: 'ANET  171117P00180000',
         call: false,
         size: 3,
         price: 4.15,
       },
       {
         id: 'newShort',
-        symbol: 'ANET',
-        strike: 170,
-        expiration: '171117',
-        call: false,
+        symbol: 'ANET  171117P00170000',
         size: -3,
         price: 4.10,
       },

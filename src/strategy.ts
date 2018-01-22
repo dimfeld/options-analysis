@@ -1,14 +1,15 @@
-import { OptionLeg } from './types';
+import { OptionLeg, OptionInfo, optionInfoFromSymbol } from './types';
 import * as _ from 'lodash';
+import { optionInfoFromLeg } from './index';
 
 export type Classifier = (legs : OptionLeg[], score : ComboScore) => string|null;
 
-export function isShort(leg : OptionLeg) { return leg.size < 0; }
-export function isLong(leg : OptionLeg) { return leg.size > 1; }
-export function isShortPut(leg : OptionLeg) { return !leg.call && isShort(leg); }
-export function isLongPut(leg : OptionLeg) { return !leg.call && isLong(leg); }
-export function isShortCall(leg : OptionLeg) { return leg.call && isShort(leg); }
-export function isLongCall(leg: OptionLeg) { return leg.call && isLong(leg); }
+export function isShort(leg : OptionInfo) { return leg.size < 0; }
+export function isLong(leg : OptionInfo) { return leg.size > 0; }
+export function isShortPut(leg : OptionInfo) { return !leg.call && isShort(leg); }
+export function isLongPut(leg : OptionInfo) { return !leg.call && isLong(leg); }
+export function isShortCall(leg : OptionInfo) { return leg.call && isShort(leg); }
+export function isLongCall(leg: OptionInfo) { return leg.call && isLong(leg); }
 
 export enum LegType {
   ShortPut = 0,
@@ -17,7 +18,7 @@ export enum LegType {
   LongCall = 3,
 }
 
-export function legType(leg : OptionLeg) : LegType {
+export function legType(leg : OptionInfo) : LegType {
   if(isShort(leg)) {
     return leg.call ? LegType.ShortCall : LegType.ShortPut;
   } else {
@@ -28,7 +29,7 @@ export function legType(leg : OptionLeg) : LegType {
 export type ComboScore = number;
 export const UnknownCombo : ComboScore = 1;
 
-export function calculateComboScore(orderedLegs : OptionLeg[]) : ComboScore {
+export function calculateComboScore(orderedLegs : OptionInfo[]) : ComboScore {
   if(orderedLegs.length > 8) {
     return UnknownCombo;
   }
@@ -77,31 +78,31 @@ export function formatExpiration(expiration : string) {
 }
 
 export const sameExpDescribers = {
-  [comboScores.shortIronCondor]: (exp : string, legs: OptionLeg[]) => {
+  [comboScores.shortIronCondor]: (exp : string, legs: OptionInfo[]) => {
     let name = legs[1].strike === legs[2].strike ? 'Iron Butterfly' : 'Iron Condor';
     return `${-legs[0].size} ${exp} ${legs[0].strike}/${legs[1].strike}P ${legs[2].strike}/${legs[3].strike}C ${name}`;
   },
-  [comboScores.shortInvertedIronCondor]: (exp : string, legs: OptionLeg[]) => {
+  [comboScores.shortInvertedIronCondor]: (exp : string, legs: OptionInfo[]) => {
     return `${-legs[0].size} ${exp} Inverted Iron Condor ${legs[0].strike}/${legs[1].strike}P ${legs[2].strike}/${legs[3].strike}C`;
   },
-  [comboScores.shortStrangle]: (exp : string, legs : OptionLeg[]) => {
+  [comboScores.shortStrangle]: (exp : string, legs : OptionInfo[]) => {
     if(legs[0].strike === legs[1].strike) {
       return `${-legs[0].size} ${exp} ${legs[0].strike} Short Straddle`;
     } else {
       return `${-legs[0].size} ${exp} ${legs[0].strike}P ${legs[1].strike}C Short Strangle`
     }
   },
-  [comboScores.invertedShortStrangle]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.invertedShortStrangle]: (exp: string, legs: OptionInfo[]) => {
     return `${-legs[0].size} ${exp} ${legs[0].strike}C ${legs[1].strike}P Inverted Short Strangle`;
   },
-  [comboScores.longStrangle]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.longStrangle]: (exp: string, legs: OptionInfo[]) => {
     if(legs[0].strike === legs[1].strike) {
       return `${legs[0].size} ${exp} ${legs[0].strike} Long Straddle`;
     } else {
       return `${legs[0].size} ${exp} ${legs[0].strike}P ${legs[1].strike}C Long Strangle`
     }
   },
-  [comboScores.invertedLongStrangle]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.invertedLongStrangle]: (exp: string, legs: OptionInfo[]) => {
     if(legs[0].strike === legs[1].strike) {
       return `${legs[0].size} ${exp} ${legs[0].strike} Inverted Long Straddle`;
     } else {
@@ -109,40 +110,41 @@ export const sameExpDescribers = {
     }
   },
 
-  [comboScores.putCreditSpread]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.putCreditSpread]: (exp: string, legs: OptionInfo[]) => {
     return `${-legs[0].size} ${exp} ${legs[0].strike}/${legs[1].strike}P Put Credit Spread`;
   },
-  [comboScores.callCreditSpread]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.callCreditSpread]: (exp: string, legs: OptionInfo[]) => {
     return `${-legs[0].size} ${exp} ${legs[0].strike}/${legs[1].strike}C Call Credit Spread`;
   },
-  [comboScores.putDebitSpread]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.putDebitSpread]: (exp: string, legs: OptionInfo[]) => {
     return `${legs[0].size} ${exp} ${legs[0].strike}/${legs[1].strike}P Put Debit Spread`;
   },
-  [comboScores.callDebitSpread]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.callDebitSpread]: (exp: string, legs: OptionInfo[]) => {
     return `${legs[0].size} ${exp} ${legs[0].strike}/${legs[1].strike}C Call Debit Spread`;
   },
 
-  [comboScores.shortSinglePut]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.shortSinglePut]: (exp: string, legs: OptionInfo[]) => {
     return `${-legs[0].size} ${exp} ${legs[0].strike} Short Put`;
   },
-  [comboScores.shortSingleCall]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.shortSingleCall]: (exp: string, legs: OptionInfo[]) => {
     return `${-legs[0].size} ${exp} ${legs[0].strike} Short Call`;
   },
-  [comboScores.longSinglePut]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.longSinglePut]: (exp: string, legs: OptionInfo[]) => {
     return `${legs[0].size} ${exp} ${legs[0].strike} Long Put`;
   },
-  [comboScores.longSingleCall]: (exp: string, legs: OptionLeg[]) => {
+  [comboScores.longSingleCall]: (exp: string, legs: OptionInfo[]) => {
     return `${legs[0].size} ${exp} ${legs[0].strike} Long Call`;
   },
 };
 
 export function classify(legs : OptionLeg[]) {
-  let orderedLegs = _.sortBy(legs, ['strike', 'call', 'expiration']);
+  let optionInfos = _.map(legs, optionInfoFromLeg);
+  let orderedLegs = _.sortBy(optionInfos, ['strike', 'call', 'expiration']);
   let score = calculateComboScore(orderedLegs);
-  let expiration = legs[0].expiration;
-  let size = legs[0].size;
+  let expiration = optionInfos[0].expiration;
+  let size = optionInfos[0].size;
 
-  let otherLegs = legs.slice(1);
+  let otherLegs = optionInfos.slice(1);
   let allSameExpiration = _.every(otherLegs, (leg) => leg.expiration === expiration);
   let allSameSize = _.every(otherLegs, (leg) => leg.size === size);
   if(!allSameExpiration || !allSameSize) {
@@ -150,11 +152,11 @@ export function classify(legs : OptionLeg[]) {
     return null;
   }
 
-  let exp = formatExpiration(legs[0].expiration);
+  let exp = formatExpiration(optionInfos[0].expiration);
   let describer = sameExpDescribers[score];
   if(!describer) {
     return null;
   }
 
-  return describer(exp, legs);
+  return describer(exp, optionInfos);
 }
