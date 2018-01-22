@@ -5,7 +5,14 @@
         "sourceMap": true,
         "module": "commonjs",
         "alwaysStrict": true,
-        "declaration": true
+        "declaration": true,
+        "lib": [
+            "dom",
+            "es6",
+            "dom.iterable",
+            "scripthost",
+            "esnext.asynciterable"
+        ]
     },
     "include": [
         "src/**/*"
