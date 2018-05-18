@@ -1,5 +1,6 @@
+/* tslint:disable no-implicit-dependencies */
 import { assert } from 'chai';
-import * as position from './position';
+import * as position from './position_simulator';
 import { OptionLeg, fullSymbol } from './types';
 import * as _ from 'lodash';
 

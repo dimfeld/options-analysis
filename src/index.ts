@@ -1,3 +1,3 @@
 export * from './types';
 export * from './strategy';
-export * from './position';
+export * from './position_simulator';

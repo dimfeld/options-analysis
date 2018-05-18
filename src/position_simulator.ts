@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { OptionLeg, fullSymbol } from './types';
-import * as uuid from 'uuid';
+import * as hyperid from 'hyperid';
 
 export enum Change {
   // The leg in `changedBy` closed the affected leg.
@@ -50,7 +50,7 @@ export class PositionSimulator {
 
   addLeg(leg : OptionLeg) : SimulationResults {
     if(!leg.id) {
-      leg.id = uuid.v1();
+      leg.id = hyperid();
     }
 
     let symbol = leg.symbol;
@@ -114,7 +114,7 @@ export class PositionSimulator {
         // The closed leg should be the newly created object, so that the one that remains in the system is the same leg that was originally added.
         let closedLeg = _.clone(el);
         closedLeg.size = -remaining;
-        closedLeg.id = uuid.v1();
+        closedLeg.id = hyperid();
 
         result.push(
           {
@@ -149,7 +149,7 @@ export class PositionSimulator {
       // This leg not only closed some positions, but opened new ones.
       let newLeg = _.clone(leg);
       newLeg.size = remaining;
-      newLeg.id = uuid.v1();
+      newLeg.id = hyperid();
 
       result.push({
         affected: newLeg,
