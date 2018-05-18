@@ -18,11 +18,12 @@
     "@types/mocha": "^2.2.43",
     "chai": "^4.1.2",
     "mocha": "^4.0.1",
+    "ts-node": "^6.0.3",
     "typescript": "^2.6.1"
   },
   "dependencies": {
     "debug": "^3.1.0",
-    "lodash": "^4.17.4",
-    "uuid": "^3.1.0"
+    "hyperid": "^1.2.0",
+    "lodash": "^4.17.4"
   }
 }
