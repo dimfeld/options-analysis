@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import { OptionLeg, fullSymbol } from './types';
-import * as hyperid from 'hyperid';
 
 export enum Change {
   // The leg in `changedBy` closed the affected leg.
@@ -44,15 +43,23 @@ export class PositionSimulator {
     });
   }
 
+  getFlattenedList() : OptionLeg[] {
+    return _.chain(this.legs)
+      .map((legs, symbol) => {
+        let size = _.sumBy(legs, 'size');
+        if(size !== 0) {
+          return { symbol, size };
+        }
+      })
+      .compact()
+      .value();
+  }
+
   addLegs(legs : OptionLeg[]) : SimulationResults {
     return _.flatMap(legs, (leg) => this.addLeg(leg));
   }
 
   addLeg(leg : OptionLeg) : SimulationResults {
-    if(!leg.id) {
-      leg.id = hyperid();
-    }
-
     let symbol = leg.symbol;
     let existing = this.legs[symbol];
     if(!existing || !existing.length) {
@@ -114,7 +121,6 @@ export class PositionSimulator {
         // The closed leg should be the newly created object, so that the one that remains in the system is the same leg that was originally added.
         let closedLeg = _.clone(el);
         closedLeg.size = -remaining;
-        closedLeg.id = hyperid();
 
         result.push(
           {
@@ -149,7 +155,6 @@ export class PositionSimulator {
       // This leg not only closed some positions, but opened new ones.
       let newLeg = _.clone(leg);
       newLeg.size = remaining;
-      newLeg.id = hyperid();
 
       result.push({
         affected: newLeg,

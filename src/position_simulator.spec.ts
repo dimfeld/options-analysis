@@ -25,13 +25,25 @@ function checkSimState(sim, legs, description = 'simulator state') {
     return memo;
   }, {});
   assert.deepEqual(checkLegs, expectedLegs(legs), description);
+
+  let flattened = _.chain(legs)
+    .groupBy('symbol')
+    .map((l, symbol) => {
+      let size = _.sumBy(l, 'size');
+      if(size) {
+        return { symbol, size: size };
+      }
+    })
+    .compact()
+    .value();
+
+  assert.sameDeepMembers(sim.getFlattenedList(), flattened, 'getFlattenedList');
 }
 
 describe("simulator", function() {
   it("new position from scratch", function() {
     let sim = new position.PositionSimulator();
     let leg = {
-      id: 'abc',
       symbol: 'ANET  171020P00180000',
       size: 2,
       price: 4.35,
@@ -57,13 +69,11 @@ describe("simulator", function() {
     let sim = new position.PositionSimulator();
     let legs = [
       {
-        id: 'abc',
         symbol: 'ANET  171020P00180000',
         size: 2,
         price: 4.35,
       },
       {
-        id: 'def',
         symbol: 'ANET  171020P00170000',
         size: -2,
         price: 4.35,
@@ -100,13 +110,11 @@ describe("simulator", function() {
   it("adding to a position", function() {
     let legs = [
       {
-        id: 'abc',
         symbol: 'ANET  171020P00180000',
         size: 2,
         price: 4.35,
       },
       {
-        id: 'def',
         symbol: 'ANET  171020P00170000',
         size: -2,
         price: 4.35,
@@ -118,13 +126,11 @@ describe("simulator", function() {
 
     let newLegs = [
       {
-        id: 'aaa',
         symbol: 'ANET  171020P00180000',
         size: 2,
         price: 4.35,
       },
       {
-        id: 'bbb',
         symbol: 'ANET  171020P00170000',
         size: -2,
         price: 4.35,
@@ -160,13 +166,11 @@ describe("simulator", function() {
   it("closing a position", function() {
     let legs = [
       {
-        id: 'longStrike',
         symbol: 'ANET  171020P00180000',
         size: 2,
         price: 4.35,
       },
       {
-        id: 'shortStrike',
         symbol: 'ANET  171020P00170000',
         size: -2,
         price: 4.35,
@@ -178,13 +182,11 @@ describe("simulator", function() {
 
     let closingLegs = [
       {
-        id: 'closingShortStrike',
         symbol: 'ANET  171020P00170000',
         size: 2,
         price: 2.45,
       },
       {
-        id: 'closingLongStrike',
         symbol: 'ANET  171020P00180000',
         size: -2,
         price: 2.45,
@@ -228,13 +230,11 @@ describe("simulator", function() {
   it("partial close", function() {
     let legs = [
       {
-        id: 'longStrike',
         symbol: 'ANET  171020P00180000',
         size: 3,
         price: 4.35,
       },
       {
-        id: 'shortStrike',
         symbol: 'ANET  171020P00170000',
         size: -3,
         price: 4.35,
@@ -246,13 +246,11 @@ describe("simulator", function() {
 
     let closingLegs = [
       {
-        id: 'closingShortStrike',
         symbol: 'ANET  171020P00170000',
         size: 1,
         price: 2.45,
       },
       {
-        id: 'closingLongStrike',
         symbol: 'ANET  171020P00180000',
         size: -1,
         price: 2.45,
@@ -260,9 +258,6 @@ describe("simulator", function() {
     ];
 
     let result = sim.addLegs([closingLegs[0]]);
-    assert.notEqual(result[1].affected.id, legs[1].id, 'new leg object gets new id')
-    assert.isOk(result[1].affected.id, 'new leg object gets new id');
-    result[1].affected.id = 'newid'; // Set it to something known for the assert below.
     let reducedShort = _.extend({}, legs[1], { size: -2 });
     let expected = [
       {
@@ -276,7 +271,7 @@ describe("simulator", function() {
 
       },
       {
-        affected: _.extend({}, legs[1], { size: -1, id: 'newid' }),
+        affected: _.extend({}, legs[1], { size: -1 }),
         changedBy: closingLegs[0],
         change: position.Change.Closed,
         changeAmount: 1,
@@ -290,9 +285,6 @@ describe("simulator", function() {
     checkSimState(sim, [reducedShort, legs[0]], 'sim state after closing short');
 
     result = sim.addLegs([closingLegs[1]]);
-    assert.notEqual(result[1].affected.id, legs[0].id, 'new leg object gets new id')
-    assert.isOk(result[1].affected.id, 'new leg object gets new id');
-    result[1].affected.id = 'newid'; // Set it to something known for the assert below.
     let reducedLong = _.extend({}, legs[0], { size: 2 });
     expected = [
       {
@@ -306,7 +298,7 @@ describe("simulator", function() {
 
       },
       {
-        affected: _.extend({}, legs[0], { size: 1, id: 'newid' }),
+        affected: _.extend({}, legs[0], { size: 1 }),
         changedBy: closingLegs[1],
         change: position.Change.Closed,
         changeAmount: -1,
@@ -323,13 +315,11 @@ describe("simulator", function() {
   it("rolling", function() {
     let initialState = [
       {
-        id: 'longStrike',
         symbol: 'ANET  171020P00180000',
         size: 3,
         price: 4.35,
       },
       {
-        id: 'shortStrike',
         symbol: 'ANET  171020P00170000',
         size: -3,
         price: 4.35,
@@ -341,26 +331,22 @@ describe("simulator", function() {
 
     let rolling = [
       {
-        id: 'closeLong',
         symbol: 'ANET  171020P00180000',
         size: -3,
         price: 3.27,
       },
       {
-        id: 'closeShort',
         symbol: 'ANET  171020P00170000',
         size: 3,
         price: 3.15,
       },
       {
-        id: 'newLong',
         symbol: 'ANET  171117P00180000',
         call: false,
         size: 3,
         price: 4.15,
       },
       {
-        id: 'newShort',
         symbol: 'ANET  171117P00170000',
         size: -3,
         price: 4.10,
