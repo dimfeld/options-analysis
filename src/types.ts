@@ -23,6 +23,11 @@ export function occExpirationFromDate(d : Date) {
   return `${year}${month}${day}`;
 }
 
+export function dateFromOccExpiration(e : string) {
+  let year = '20' + e.slice(0, 2);
+  return new Date(+year, (+e.slice(2, 4)) - 1, +e.slice(4));
+}
+
 export function fullSymbol(ol: OptionInfo, padSymbol=true) {
   if(!_.isNil(ol.call) && ol.strike) {
     let legType = ol.call ? 'C' : 'P';
