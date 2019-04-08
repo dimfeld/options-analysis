@@ -1,11 +1,18 @@
 {
     "compilerOptions": {
-        "outDir": "./lib",
-        "target": "es2017",
+        "outDir": "./lib-browser",
+        "target": "es5",
         "sourceMap": true,
         "module": "commonjs",
         "alwaysStrict": true,
         "declaration": true,
+        "lib": [
+            "dom",
+            "es6",
+            "dom.iterable",
+            "scripthost",
+            "esnext.asynciterable"
+        ]
     },
     "include": [
         "src/**/*"
