@@ -7,4 +7,4 @@ export interface MatchingPositionScore<T> {
     overlapping: number;
     position: T;
 }
-export declare function match_positions<T extends HasOptionLegs>(trade: HasOptionLegs, positions: T[]): Array<MatchingPositionScore<T>>;
+export declare function matchPositions<T extends HasOptionLegs>(trade: HasOptionLegs, positions: T[]): Array<MatchingPositionScore<T>>;
