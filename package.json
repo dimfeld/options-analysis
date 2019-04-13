@@ -8,6 +8,7 @@
   "scripts": {
     "test": "mocha --opts mocha.opts",
     "build": "tsc --build tsconfig.json && tsc --build tsconfig-browser.json && git add lib && git add lib-browser",
+    "preversion": "yarn test",
     "version": "yarn run build",
     "postversion": "git push && git push --tags"
   },
