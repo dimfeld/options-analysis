@@ -4,7 +4,7 @@ import { ContractInfo } from 'tda-api';
 
 const debug = debugMod('option_finder');
 
-export type StrikeMap = _.Dictionary<ContractInfo>;
+export type StrikeMap = _.Dictionary<ContractInfo[]>;
 export type ExpirationDateMap = _.Dictionary<StrikeMap>;
 
 export function closestDeltas(strikes: StrikeMap, deltas: number[]) {
