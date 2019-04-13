@@ -1,8 +1,8 @@
 /* tslint:disable no-implicit-dependencies */
 import { assert } from 'chai';
-import { match_positions } from './match';
+import { matchPositions } from './match';
 
-describe('match_positions', function() {
+describe('matchPositions', function() {
   it('matches', function() {
     let positions = [
       {
@@ -32,7 +32,7 @@ describe('match_positions', function() {
       ],
     };
 
-    let results = match_positions(trade, positions);
+    let results = matchPositions(trade, positions);
 
     let expected = [
       { score: 1, overlapping: 2, position: positions[1] },

@@ -11,7 +11,7 @@ export interface MatchingPositionScore<T> {
   position: T;
 }
 
-export function match_positions<T extends HasOptionLegs>(trade : HasOptionLegs, positions: T[]) : Array<MatchingPositionScore<T>> {
+export function matchPositions<T extends HasOptionLegs>(trade : HasOptionLegs, positions: T[]) : Array<MatchingPositionScore<T>> {
 
   let legs = trade.legs;
 
