@@ -1,6 +1,4 @@
 module.exports = {
-  include: '*.ts',
-  exclude: '*.spec.ts',
   sourceMaps: true,
   env: {
     browser: {

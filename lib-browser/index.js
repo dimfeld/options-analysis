@@ -1,11 +1,6 @@
-"use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./types"));
-__export(require("./strategy"));
-__export(require("./position_simulator"));
-__export(require("./match"));
-__export(require("./leg_finder"));
+export * from './types';
+export * from './strategy';
+export * from './position_simulator';
+export * from './match';
+export * from './leg_finder';
 //# sourceMappingURL=index.js.map

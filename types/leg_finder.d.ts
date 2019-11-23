@@ -49,13 +49,13 @@ export declare function analyzeLiquidity(config: AnalyzeSideOptions & FilterLiqu
     symbol: string;
     results: {
         symbol: string;
-        putCall: string;
         description: string;
+        mark: number;
+        putCall: string;
         exchangeName: string;
         bid: number;
         ask: number;
         last: number;
-        mark: number;
         bidSize: number;
         askSize: number;
         lastSize: number;
