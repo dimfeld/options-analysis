@@ -1,3 +1,18 @@
+export interface TradeLeg {
+    size: number;
+    price: number;
+    symbol: string;
+}
+export interface Trade {
+    price_each: number;
+    gross: number;
+    legs: TradeLeg[];
+}
+export interface Position<T extends Trade> {
+    symbol: string;
+    legs: OptionLeg[];
+    trades: T[];
+}
 export interface OptionLeg {
     id?: string;
     symbol: string;

@@ -1,5 +1,4 @@
 /* tslint:disable no-implicit-dependencies */
-import { assert } from 'chai';
 import { matchPositions } from './match';
 
 describe('matchPositions', function() {
@@ -37,7 +36,7 @@ describe('matchPositions', function() {
     let expected = [
       { score: 1, overlapping: 2, position: positions[1] },
       { score: 0.5, overlapping: 1, position: positions[0] },
-    ]
-    assert.deepEqual(results, expected);
+    ];
+    expect(results).toEqual(expected);
   });
 });

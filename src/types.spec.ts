@@ -1,8 +1,7 @@
-import { assert } from 'chai';
 import { fullSymbol, optionInfoFromSymbol, optionInfoFromLeg } from './types';
 
-describe("fullSymbol", function() {
-  it("put", function() {
+describe('fullSymbol', function() {
+  it('put', function() {
     let leg = {
       underlying: 'ANET',
       strike: 180,
@@ -11,10 +10,10 @@ describe("fullSymbol", function() {
       size: 2,
     };
 
-    assert.equal(fullSymbol(leg), 'ANET  171020P00180000');
+    expect(fullSymbol(leg)).toBe('ANET  171020P00180000');
   });
 
-  it("call", function() {
+  it('call', function() {
     let leg = {
       underlying: 'ABCDEF',
       strike: 5.75,
@@ -23,10 +22,10 @@ describe("fullSymbol", function() {
       size: 2,
     };
 
-    assert.equal(fullSymbol(leg), 'ABCDEF171020C00005750');
+    expect(fullSymbol(leg)).toBe('ABCDEF171020C00005750');
   });
 
-  it("stock", function() {
+  it('stock', function() {
     let leg = {
       underlying: 'IBM',
       strike: null,
@@ -35,7 +34,7 @@ describe("fullSymbol", function() {
       size: 300,
     };
 
-    assert.equal(fullSymbol(leg), 'IBM');
+    expect(fullSymbol(leg)).toBe('IBM');
   });
 });
 
@@ -49,7 +48,7 @@ describe('optionInfoFromSymbol', function() {
     };
 
     let seen = optionInfoFromSymbol('ABCDEF171020C00005750');
-    assert.deepEqual(seen, expected);
+    expect(seen).toEqual(expected);
   });
 
   it('put', function() {
@@ -61,7 +60,7 @@ describe('optionInfoFromSymbol', function() {
     };
 
     let seen = optionInfoFromSymbol('ANET  171020P00180000');
-    assert.deepEqual(seen, expected);
+    expect(seen).toEqual(expected);
   });
 
   it('stock', function() {
@@ -73,6 +72,6 @@ describe('optionInfoFromSymbol', function() {
     };
 
     let seen = optionInfoFromSymbol('ANET');
-    assert.deepEqual(seen, expected);
-  })
+    expect(seen).toEqual(expected);
+  });
 });

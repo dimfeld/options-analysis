@@ -6,23 +6,28 @@
   "browser": "lib-browser/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "test": "mocha --opts mocha.opts",
-    "build": "tsc --build tsconfig.json && tsc --build tsconfig-browser.json && git add lib && git add lib-browser",
+    "test": "jest",
+    "clean": "rm -rf lib && rm -rf lib-browser",
+    "build-node": "tsc --build tsconfig.json",
+    "build-browser": "tsc --build tsconfig-browser.json",
+    "build": "yarn run build-node && yarn run build-browser",
+    "add-lib": "git add lib && git add lib-browser",
     "preversion": "yarn test",
-    "version": "yarn run build",
+    "version": "yarn run build && yarn run add-lib",
     "postversion": "git push && git push --tags"
   },
   "author": "Daniel Imfeld",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/chai": "^4.0.4",
     "@types/debug": "^0.0.30",
+    "@types/jest": "^24.0.23",
     "@types/lodash": "^4.14.76",
-    "@types/mocha": "^2.2.43",
-    "chai": "^4.1.2",
-    "mocha": "^4.0.1",
-    "ts-node": "^6.0.3",
-    "typescript": "^3"
+    "babel-jest": "^24.9.0",
+    "jest": "^24.9.0",
+    "jest-extended": "^0.11.2",
+    "ts-jest": "^24.2.0",
+    "ts-node": "^7",
+    "typescript": "^3.7"
   },
   "dependencies": {
     "debug": "^3.1.0",

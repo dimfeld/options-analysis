@@ -28,7 +28,9 @@ function closestDeltas(strikes, deltas) {
             targetDelta /= 100;
         }
         var index = _.sortedIndexBy(sorted, { delta: targetDelta }, function (x) { return Math.abs(x.delta); });
-        var greaterDistance = index < sorted.length ? Math.abs(sorted[index].delta - targetDelta) : Infinity;
+        var greaterDistance = index < sorted.length
+            ? Math.abs(sorted[index].delta - targetDelta)
+            : Infinity;
         var lesserDistance = index > 0 ? Math.abs(sorted[index - 1].delta - targetDelta) : Infinity;
         var best = greaterDistance < lesserDistance ? sorted[index] : sorted[index - 1];
         return { target: targetDelta, contract: best };
@@ -40,7 +42,14 @@ function closestAfterDte(dates, dteTarget) {
     var closestDte = _.map(dteTarget, function (target) {
         var dteNum = Number.parseInt(target, 10);
         var requireMonthly = target[target.length - 1] === 'M';
-        return { target: dteNum, dte: null, expiration: null, difference: Infinity, strikes: null, requireMonthly: requireMonthly };
+        return {
+            target: dteNum,
+            dte: null,
+            expiration: null,
+            difference: Infinity,
+            strikes: null,
+            requireMonthly: requireMonthly,
+        };
     });
     debug(closestDte);
     _.each(dates, function (strikeMap, key) {
@@ -58,7 +67,7 @@ function closestAfterDte(dates, dteTarget) {
             }
             var difference = dte - d.target;
             // If the current expiration >= the target number and is smaller than what we had before, then use it.
-            if (difference >= 0 && (difference < d.difference)) {
+            if (difference >= 0 && difference < d.difference) {
                 d.strikes = strikeMap;
                 d.difference = difference;
                 d.dte = dte;
@@ -103,12 +112,24 @@ function analyzeLiquidity(config, chain) {
         return _.chain(expiration.deltas)
             .map(function (delta) {
             var contract = delta.contract;
-            return __assign({ expiration: expiration.expiration, targetDte: expiration.target, targetDelta: delta.target, spreadPercent: contract.bid ? ((contract.ask / contract.bid) - 1) * 100 : 1000 }, _.pick(contract, ['symbol', 'delta', 'putCall', 'strikePrice', 'daysToExpiration', 'bid', 'ask', 'totalVolume', 'openInterest']));
+            return __assign({ expiration: expiration.expiration, targetDte: expiration.target, targetDelta: delta.target, spreadPercent: contract.bid
+                    ? (contract.ask / contract.bid - 1) * 100
+                    : 1000 }, _.pick(contract, [
+                'symbol',
+                'delta',
+                'putCall',
+                'strikePrice',
+                'daysToExpiration',
+                'bid',
+                'ask',
+                'totalVolume',
+                'openInterest',
+            ]));
         })
             .filter(function (data) { return filterLiquidity(config, data); })
             .value();
     });
-    debug("Results", chain.symbol, results);
+    debug('Results', chain.symbol, results);
     return { symbol: chain.symbol, results: results };
 }
 exports.analyzeLiquidity = analyzeLiquidity;

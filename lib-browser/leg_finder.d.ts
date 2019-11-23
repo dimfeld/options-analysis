@@ -23,7 +23,7 @@ export declare function analyzeSide(config: AnalyzeSideOptions, allExpirations: 
     dte: number;
     expiration: string;
     difference: number;
-    strikes: _.Dictionary<ContractInfo[]>;
+    strikes: StrikeMap;
     deltas: {
         target: number;
         contract: ContractInfo;
@@ -49,16 +49,11 @@ export declare function analyzeLiquidity(config: AnalyzeSideOptions & FilterLiqu
     symbol: string;
     results: {
         symbol: string;
-        delta: number;
         putCall: string;
-        strikePrice: number;
-        daysToExpiration: number;
-        bid: number;
-        ask: number;
-        totalVolume: number;
-        openInterest: number;
         description: string;
         exchangeName: string;
+        bid: number;
+        ask: number;
         last: number;
         mark: number;
         bidSize: number;
@@ -68,20 +63,25 @@ export declare function analyzeLiquidity(config: AnalyzeSideOptions & FilterLiqu
         lowPrice: number;
         openPrice: number;
         closePrice: number;
+        totalVolume: number;
         tradeDate: number;
         tradeTimeInLong: number;
         quoteTimeInLong: number;
         netChange: number;
         volatility: number;
+        delta: number;
         gamma: number;
         theta: number;
         vega: number;
         rho: number;
+        openInterest: number;
         timeValue: number;
         theoreticalOptionValue: number;
         theoreticalVolatility: number;
         optionDeliverablesList: any;
+        strikePrice: number;
         expirationDate: number;
+        daysToExpiration: number;
         expirationType: string;
         lastTradingDay: number;
         multiplier: number;

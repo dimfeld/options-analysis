@@ -13,23 +13,26 @@ var __assign = (this && this.__assign) || function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var _ = require("lodash");
 function occExpirationFromDate(d) {
-    var year = d.getUTCFullYear().toString().slice(2);
-    var month = _.padStart((d.getUTCMonth() + 1).toString(), 2, '0');
-    var day = _.padStart(d.getUTCDate().toString(), 2, '0');
+    var year = d
+        .getUTCFullYear()
+        .toString()
+        .slice(2);
+    var month = _.padStart((d.getUTCMonth() + 1).toString(), 2, "0");
+    var day = _.padStart(d.getUTCDate().toString(), 2, "0");
     return "" + year + month + day;
 }
 exports.occExpirationFromDate = occExpirationFromDate;
 function dateFromOccExpiration(e) {
-    var year = '20' + e.slice(0, 2);
-    return new Date(+year, (+e.slice(2, 4)) - 1, +e.slice(4));
+    var year = "20" + e.slice(0, 2);
+    return new Date(+year, +e.slice(2, 4) - 1, +e.slice(4));
 }
 exports.dateFromOccExpiration = dateFromOccExpiration;
 function fullSymbol(ol, padSymbol) {
     if (padSymbol === void 0) { padSymbol = true; }
     if (!_.isNil(ol.call) && ol.strike) {
-        var legType = ol.call ? 'C' : 'P';
-        var strike = _.padStart((ol.strike * 1000).toString(), 8, '0').slice(0, 8);
-        var symbol = padSymbol ? _.padEnd(ol.underlying, 6, ' ') : ol.underlying;
+        var legType = ol.call ? "C" : "P";
+        var strike = _.padStart((ol.strike * 1000).toString(), 8, "0").slice(0, 8);
+        var symbol = padSymbol ? _.padEnd(ol.underlying, 6, " ") : ol.underlying;
         return "" + symbol + ol.expiration + legType + strike;
     }
     else {
@@ -45,14 +48,14 @@ function optionInfoFromSymbol(symbol) {
             underlying: underlying,
             expiration: undefined,
             call: undefined,
-            strike: undefined,
+            strike: undefined
         };
     }
     return {
         underlying: underlying,
         expiration: symbol.slice(6, 12),
-        call: symbol[12] === 'C',
-        strike: +_.trimStart(symbol.slice(13)) / 1000,
+        call: symbol[12] === "C",
+        strike: +_.trimStart(symbol.slice(13)) / 1000
     };
 }
 exports.optionInfoFromSymbol = optionInfoFromSymbol;

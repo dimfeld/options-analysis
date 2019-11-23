@@ -1,6 +1,6 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
 var _ = require("lodash");
 var index_1 = require("./index");
 function isShort(leg) { return leg.size < 0; }
