@@ -39,7 +39,8 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
         data.basis += value;
         data.maxLegs += leg.size;
       } else {
-        let realized = data.basis * Math.abs(leg.size / data.maxLegs) + value;
+        let realized =
+          -1 * (value + data.basis * Math.abs(leg.size / data.maxLegs));
         data.realized += realized;
       }
 
@@ -67,8 +68,9 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
   );
 
   let unrealized = openValue - openBasis;
-  let openPlPct = unrealized / openBasis;
-  let totalPlPct = (unrealized + totalRealized) / totalBasis;
+  let openPlPct =
+    openBasis === 0 ? 0 : (100 * unrealized) / Math.abs(openBasis);
+  let totalPlPct = (100 * (unrealized + totalRealized)) / Math.abs(totalBasis);
 
   return {
     underlyingPrice,
@@ -80,5 +82,7 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
     openPlPct,
     unrealized,
     openBasis,
+
+    netLiquidity: openValue,
   };
 }
