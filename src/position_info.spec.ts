@@ -590,3 +590,103 @@ test('open some credit spreads, close some, add some more, close some', function
   expect(result.openPlPct).toBeCloseTo(openPlPct);
   expect(result.underlyingPrice).toBe(mockQuote('ANET'));
 });
+
+test('rolling spreads with increasing cost basis', function() {
+  let pos: Position<Trade> = {
+    symbol: 'ANET',
+    trades: [
+      {
+        price_each: 1,
+        gross: 500,
+        legs: [
+          { symbol: 'ANET  171020P00140000', size: -5, price: 2 },
+          { symbol: 'ANET  171020P00130000', size: 5, price: 1 },
+        ],
+      },
+
+      {
+        price_each: 0.5,
+        gross: 250,
+        legs: [
+          { symbol: 'ANET  171020P00140000', size: 5, price: 3 },
+          { symbol: 'ANET  171020P00130000', size: -5, price: 1.5 },
+          { symbol: 'ANET  171020P00190000', size: -5, price: 4 },
+          { symbol: 'ANET  171020P00180000', size: 5, price: 2 },
+        ],
+      },
+    ],
+    legs: [
+      { symbol: 'ANET  171020P00190000', size: -5 },
+      { symbol: 'ANET  171020P00180000', size: 5 },
+    ],
+  };
+
+  let totalBasis = -1000;
+  let netLiquidity = -150 * 5;
+  let openBasis = -1000;
+  let unrealized = netLiquidity - openBasis;
+  let realized = -250;
+  let openPlPct = (unrealized / Math.abs(openBasis)) * 100;
+  let totalPlPct = ((realized + unrealized) / Math.abs(totalBasis)) * 100;
+
+  let result = positionInfo(pos, mockQuote);
+
+  expect(result.totalBasis).toBeCloseTo(totalBasis);
+  expect(result.openBasis).toBeCloseTo(openBasis);
+  expect(result.netLiquidity).toBeCloseTo(netLiquidity);
+  expect(result.unrealized).toBeCloseTo(unrealized);
+  expect(result.totalPlPct).toBeCloseTo(totalPlPct);
+  expect(result.totalRealized).toBeCloseTo(realized);
+  expect(result.openPlPct).toBeCloseTo(openPlPct);
+  expect(result.underlyingPrice).toBe(mockQuote('ANET'));
+});
+
+test('rolling spreads with decreasing cost basis', function() {
+  let pos: Position<Trade> = {
+    symbol: 'ANET',
+    trades: [
+      {
+        price_each: 1,
+        gross: 500,
+        legs: [
+          { symbol: 'ANET  171020P00140000', size: -5, price: 2 },
+          { symbol: 'ANET  171020P00130000', size: 5, price: 1 },
+        ],
+      },
+
+      {
+        price_each: 0.5,
+        gross: 250,
+        legs: [
+          { symbol: 'ANET  171020P00140000', size: 5, price: 3 },
+          { symbol: 'ANET  171020P00130000', size: -5, price: 2.5 },
+          { symbol: 'ANET  171020P00190000', size: -5, price: 4 },
+          { symbol: 'ANET  171020P00180000', size: 5, price: 3.75 },
+        ],
+      },
+    ],
+    legs: [
+      { symbol: 'ANET  171020P00190000', size: -5 },
+      { symbol: 'ANET  171020P00180000', size: 5 },
+    ],
+  };
+
+  let totalBasis = -500;
+  let netLiquidity = -150 * 5;
+  let openBasis = -125;
+  let unrealized = netLiquidity - openBasis;
+  let realized = 250;
+  let openPlPct = (unrealized / Math.abs(openBasis)) * 100;
+  let totalPlPct = ((realized + unrealized) / Math.abs(totalBasis)) * 100;
+
+  let result = positionInfo(pos, mockQuote);
+
+  expect(result.totalBasis).toBeCloseTo(totalBasis);
+  expect(result.openBasis).toBeCloseTo(openBasis);
+  expect(result.netLiquidity).toBeCloseTo(netLiquidity);
+  expect(result.unrealized).toBeCloseTo(unrealized);
+  expect(result.totalPlPct).toBeCloseTo(totalPlPct);
+  expect(result.totalRealized).toBeCloseTo(realized);
+  expect(result.openPlPct).toBeCloseTo(openPlPct);
+  expect(result.underlyingPrice).toBe(mockQuote('ANET'));
+});

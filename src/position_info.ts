@@ -9,10 +9,12 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
   interface LegData {
     openingIsLong: boolean;
     openBasis: number;
-    maxBasis: number;
     openLegs: number;
     realized: number;
   }
+
+  let openTotalBasis = 0;
+  let maxTotalBasis = 0;
 
   let legData: Dictionary<LegData> = {};
 
@@ -25,7 +27,6 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
           openingIsLong: thisLong,
           openLegs: 0,
           openBasis: 0,
-          maxBasis: 0,
           realized: 0,
         };
       }
@@ -37,13 +38,12 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
       // original leg (or it's the first) then add it to the basis.
       if (thisLong === data.openingIsLong) {
         data.openBasis += value;
-        if (Math.abs(data.openBasis) > Math.abs(data.maxBasis)) {
-          data.maxBasis = data.openBasis;
-        }
+        openTotalBasis += value;
       } else {
         let theseLegsBasis =
           data.openBasis * Math.abs(leg.size / data.openLegs);
         data.openBasis -= theseLegsBasis;
+        openTotalBasis -= theseLegsBasis;
 
         let realized = -1 * (value + theseLegsBasis);
         data.realized += realized;
@@ -51,6 +51,10 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
 
       data.openLegs += leg.size;
     });
+
+    if (Math.abs(openTotalBasis) > Math.abs(maxTotalBasis)) {
+      maxTotalBasis = openTotalBasis;
+    }
   });
 
   let underlyingPrice = fetchQuote(position.symbol);
@@ -67,24 +71,23 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
   let openValue = _.sum(currentLegValues);
 
   let totalRealized = _.sum(_.map(legData, (leg) => leg.realized));
-  let totalBasis = _.sum(_.map(legData, (leg) => leg.maxBasis));
-  let openBasis = _.sum(_.map(legData, (leg) => leg.openBasis)) || 0;
 
-  let unrealized = openValue - openBasis;
+  let unrealized = openValue - openTotalBasis;
   let openPlPct =
-    openBasis === 0 ? 0 : (100 * unrealized) / Math.abs(openBasis);
-  let totalPlPct = (100 * (unrealized + totalRealized)) / Math.abs(totalBasis);
+    openTotalBasis === 0 ? 0 : (100 * unrealized) / Math.abs(openTotalBasis);
+  let totalPlPct =
+    (100 * (unrealized + totalRealized)) / Math.abs(maxTotalBasis);
 
   return {
     underlyingPrice,
 
     totalPlPct,
     totalRealized,
-    totalBasis,
+    totalBasis: maxTotalBasis,
 
     openPlPct,
     unrealized,
-    openBasis,
+    openBasis: openTotalBasis,
 
     netLiquidity: openValue,
   };
