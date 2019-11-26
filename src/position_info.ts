@@ -8,9 +8,9 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
 ) {
   interface LegData {
     openingIsLong: boolean;
-    basis: number;
+    openBasis: number;
+    maxBasis: number;
     openLegs: number;
-    maxLegs: number;
     realized: number;
   }
 
@@ -24,8 +24,8 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
         data = legData[leg.symbol] = {
           openingIsLong: thisLong,
           openLegs: 0,
-          maxLegs: 0,
-          basis: 0,
+          openBasis: 0,
+          maxBasis: 0,
           realized: 0,
         };
       }
@@ -36,11 +36,16 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
       // If this leg was opened in the same direction as the
       // original leg (or it's the first) then add it to the basis.
       if (thisLong === data.openingIsLong) {
-        data.basis += value;
-        data.maxLegs += leg.size;
+        data.openBasis += value;
+        if (Math.abs(data.openBasis) > Math.abs(data.maxBasis)) {
+          data.maxBasis = data.openBasis;
+        }
       } else {
-        let realized =
-          -1 * (value + data.basis * Math.abs(leg.size / data.maxLegs));
+        let theseLegsBasis =
+          data.openBasis * Math.abs(leg.size / data.openLegs);
+        data.openBasis -= theseLegsBasis;
+
+        let realized = -1 * (value + theseLegsBasis);
         data.realized += realized;
       }
 
@@ -62,10 +67,8 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
   let openValue = _.sum(currentLegValues);
 
   let totalRealized = _.sum(_.map(legData, (leg) => leg.realized));
-  let totalBasis = _.sum(_.map(legData, (leg) => leg.basis));
-  let openBasis = _.sum(
-    _.map(legData, (leg) => leg.basis * (leg.openLegs / leg.maxLegs))
-  );
+  let totalBasis = _.sum(_.map(legData, (leg) => leg.maxBasis));
+  let openBasis = _.sum(_.map(legData, (leg) => leg.openBasis)) || 0;
 
   let unrealized = openValue - openBasis;
   let openPlPct =
