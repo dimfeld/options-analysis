@@ -21,7 +21,8 @@
     "variable-name": [false],
     "max-classes-per-file": [false],
     "no-empty-interface": [false],
-    "no-bitwise": [false]
+    "no-bitwise": [false],
+    "trailing-comma": [false]
   },
   "rules": {
     "no-console": [false],
@@ -44,6 +45,7 @@
     "variable-name": [false],
     "max-classes-per-file": [false],
     "no-empty-interface": [false],
-    "no-bitwise": [false]
+    "no-bitwise": [false],
+    "trailing-comma": [false]
   }
 }

@@ -1,7 +1,25 @@
-import * as _ from 'lodash';
-import * as debugMod from 'debug';
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.closestDeltas = closestDeltas;
+exports.closestAfterDte = closestAfterDte;
+exports.analyzeSide = analyzeSide;
+exports.filterLiquidity = filterLiquidity;
+exports.analyzeLiquidity = analyzeLiquidity;
+
+var _ = _interopRequireWildcard(require("lodash"));
+
+var debugMod = _interopRequireWildcard(require("debug"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 const debug = debugMod('option_finder');
-export function closestDeltas(strikes, deltas) {
+
+function closestDeltas(strikes, deltas) {
   let sorted = _.chain(strikes).map(contractList => contractList[0]).orderBy(x => Math.abs(x.delta), 'asc').value();
 
   if (!sorted.length) {
@@ -29,7 +47,8 @@ export function closestDeltas(strikes, deltas) {
 
   return closest;
 }
-export function closestAfterDte(dates, dteTarget) {
+
+function closestAfterDte(dates, dteTarget) {
   let closestDte = _.map(dteTarget, target => {
     let dteNum = Number.parseInt(target, 10);
     let requireMonthly = target[target.length - 1] === 'M';
@@ -74,7 +93,8 @@ export function closestAfterDte(dates, dteTarget) {
 
   return closestDte;
 }
-export function analyzeSide(config, allExpirations) {
+
+function analyzeSide(config, allExpirations) {
   if (_.isEmpty(allExpirations)) {
     return [];
   }
@@ -91,7 +111,8 @@ export function analyzeSide(config, allExpirations) {
 
   return result;
 }
-export function filterLiquidity(config, data) {
+
+function filterLiquidity(config, data) {
   if (data.spreadPercent > (config.maxSpreadPercent || Infinity)) {
     return false;
   }
@@ -106,7 +127,8 @@ export function filterLiquidity(config, data) {
 
   return true;
 }
-export function analyzeLiquidity(config, chain) {
+
+function analyzeLiquidity(config, chain) {
   // debug("Analyzing", chain, typeof chain, "array", _.isArray(chain));
   let calls = analyzeSide(config, chain.callExpDateMap);
   let puts = analyzeSide(config, chain.putExpDateMap);

@@ -7,4 +7,5 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(p
     openPlPct: number;
     unrealized: number;
     openBasis: number;
+    netLiquidity: number;
 };
