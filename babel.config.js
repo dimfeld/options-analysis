@@ -1,9 +1,5 @@
 module.exports = {
   sourceMaps: true,
-  presets: [
-    ['@babel/preset-env', { targets: { node: true } }],
-    ['@babel/preset-typescript', { allExtensions: true }],
-  ],
   env: {
     browser: {
       presets: [

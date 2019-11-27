@@ -1,5 +1,5 @@
-import * as _ from 'lodash';
-import * as debugMod from 'debug';
+import _ from 'lodash';
+import debugMod from 'debug';
 import { ContractInfo } from 'tda-api';
 
 const debug = debugMod('option_finder');

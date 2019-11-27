@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { ContractInfo } from 'tda-api';
 export declare type StrikeMap = _.Dictionary<ContractInfo[]>;
 export declare type ExpirationDateMap = _.Dictionary<StrikeMap>;

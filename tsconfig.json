@@ -6,7 +6,8 @@
     "module": "commonjs",
     "alwaysStrict": true,
     "declaration": true,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
   "exclude": ["src/**/*.spec.ts"]

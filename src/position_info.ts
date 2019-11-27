@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-import { Dictionary } from 'lodash';
+import _, { Dictionary } from 'lodash';
 import { Position, Trade } from './types';
 
 export default function positionInfo<T extends Position<TR>, TR extends Trade>(
