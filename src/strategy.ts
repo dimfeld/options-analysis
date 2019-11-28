@@ -1,6 +1,5 @@
-import { OptionLeg, OptionInfo, optionInfoFromSymbol } from './types';
+import { OptionLeg, OptionInfo, optionInfoFromLeg } from './types';
 import _ from 'lodash';
-import { optionInfoFromLeg } from './index';
 
 export type Classifier = (
   legs: OptionLeg[],
