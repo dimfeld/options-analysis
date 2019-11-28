@@ -1,5 +1,5 @@
+import { optionInfoFromLeg } from './types';
 import _ from 'lodash';
-import { optionInfoFromLeg } from './index';
 export function isShort(leg) {
   return leg.size < 0;
 }
