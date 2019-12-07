@@ -1,5 +1,8 @@
-import _ from 'lodash';
 import { OptionLeg, fullSymbol } from './types';
+import sumBy from 'lodash/sumBy';
+import each from 'lodash/each';
+import map from 'lodash/map';
+import flatMap from 'lodash/flatMap';
 
 export enum Change {
   // The leg in `changedBy` closed the affected leg.
@@ -31,7 +34,7 @@ export class PositionSimulator {
 
   constructor(initial?: OptionLeg[]) {
     this.legs = {};
-    _.each(initial, (leg) => {
+    each(initial, (leg) => {
       let symbol = leg.symbol;
       let list = this.legs[symbol];
       if (list) {
@@ -43,19 +46,16 @@ export class PositionSimulator {
   }
 
   getFlattenedList(): OptionLeg[] {
-    return _.chain(this.legs)
-      .map((legs, symbol) => {
-        let size = _.sumBy(legs, 'size');
-        if (size !== 0) {
-          return { symbol, size };
-        }
-      })
-      .compact()
-      .value();
+    return map(this.legs, (legs, symbol) => {
+      let size = sumBy(legs, 'size');
+      if (size !== 0) {
+        return { symbol, size };
+      }
+    }).filter(Boolean);
   }
 
   addLegs(legs: OptionLeg[]): SimulationResults {
-    return _.flatMap(legs, (leg) => this.addLeg(leg));
+    return flatMap(legs, (leg) => this.addLeg(leg));
   }
 
   addLeg(leg: OptionLeg): SimulationResults {
@@ -83,7 +83,7 @@ export class PositionSimulator {
           changedBy: leg,
           change: Change.Opened,
           changeAmount: leg.size,
-          totalSize: _.sumBy(existing, 'size'),
+          totalSize: sumBy(existing, 'size'),
           created: true,
           pnl: 0,
         },
@@ -93,12 +93,12 @@ export class PositionSimulator {
     // If we get down to here, then it's closing a position.
     let result: SimulationResults = [];
     let newExisting: OptionLeg[] = [];
-    let totalSize = _.sumBy(existing, 'size') + leg.size;
+    let totalSize = sumBy(existing, 'size') + leg.size;
 
     let remaining = leg.size;
     let absRemaining = Math.abs(remaining);
 
-    _.each(existing, (el) => {
+    each(existing, (el) => {
       let absSize = Math.abs(el.size);
       if (absSize <= absRemaining) {
         // The new leg completely closes out this one.
@@ -121,7 +121,7 @@ export class PositionSimulator {
         newExisting.push(el);
 
         // The closed leg should be the newly created object, so that the one that remains in the system is the same leg that was originally added.
-        let closedLeg = _.clone(el);
+        let closedLeg = { ...el };
         closedLeg.size = -remaining;
 
         result.push(
@@ -154,7 +154,7 @@ export class PositionSimulator {
 
     if (absRemaining > 0) {
       // This leg not only closed some positions, but opened new ones.
-      let newLeg = _.clone(leg);
+      let newLeg = { ...leg };
       newLeg.size = remaining;
 
       result.push({

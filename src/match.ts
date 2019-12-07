@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import orderBy from 'lodash/orderBy';
 import { OptionLeg } from './types';
 
 export interface HasOptionLegs {
@@ -17,22 +17,17 @@ export function matchPositions<T extends HasOptionLegs>(
 ): Array<MatchingPositionScore<T>> {
   let legs = trade.legs;
 
-  return _.chain(positions)
+  let matched = positions
     .map((position) => {
-      let overlapping = _.reduce(
-        legs,
-        (acc, leg) => {
-          let found_leg = _.find(
-            position.legs,
-            (p_leg) => p_leg.symbol === leg.symbol
-          );
-          if (found_leg) {
-            acc += 1;
-          }
-          return acc;
-        },
-        0
-      );
+      let overlapping = legs.reduce((acc, leg) => {
+        let found_leg = position.legs.find(
+          (p_leg) => p_leg.symbol === leg.symbol
+        );
+        if (found_leg) {
+          acc += 1;
+        }
+        return acc;
+      }, 0);
 
       return {
         score: overlapping / position.legs.length,
@@ -40,7 +35,7 @@ export function matchPositions<T extends HasOptionLegs>(
         position,
       };
     })
-    .filter((x) => x.score > 0)
-    .orderBy((x) => x.score, 'desc')
-    .value();
+    .filter((x) => x.score > 0);
+
+  return orderBy(matched, (x) => x.score, 'desc');
 }

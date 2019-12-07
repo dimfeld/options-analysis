@@ -1,27 +1,36 @@
-import _ from 'lodash';
+import each from 'lodash/each';
+import map from 'lodash/map';
+import pick from 'lodash/pick';
+import flatMap from 'lodash/flatMap';
+import isEmpty from 'lodash/isEmpty';
+import orderBy from 'lodash/orderBy';
+import sortedIndexBy from 'lodash/sortedIndexBy';
+import { Dictionary } from 'lodash';
 import debugMod from 'debug';
 import { ContractInfo } from 'tda-api';
 
 const debug = debugMod('option_finder');
 
-export type StrikeMap = _.Dictionary<ContractInfo[]>;
-export type ExpirationDateMap = _.Dictionary<StrikeMap>;
+export type StrikeMap = Dictionary<ContractInfo[]>;
+export type ExpirationDateMap = Dictionary<StrikeMap>;
 
 export function closestDeltas(strikes: StrikeMap, deltas: number[]) {
-  let sorted = _.chain(strikes)
-    .map((contractList) => contractList[0])
-    .orderBy((x) => Math.abs(x.delta), 'asc')
-    .value();
+  let sorted = orderBy(
+    map(strikes, (contractList) => contractList[0]),
+    (x) => Math.abs(x.delta),
+    'asc'
+  );
+
   if (!sorted.length) {
     return null;
   }
 
-  let closest = _.map(deltas, (targetDelta) => {
+  let closest = map(deltas, (targetDelta) => {
     if (targetDelta > 1) {
       // Deal with 0-1 delta range.
       targetDelta /= 100;
     }
-    let index = _.sortedIndexBy<Partial<ContractInfo>>(
+    let index = sortedIndexBy<Partial<ContractInfo>>(
       sorted,
       { delta: targetDelta },
       (x) => Math.abs(x.delta)
@@ -52,7 +61,7 @@ export function closestAfterDte(
   dates: ExpirationDateMap,
   dteTarget: string[]
 ): ClosestDte[] {
-  let closestDte = _.map(dteTarget, (target) => {
+  let closestDte = map(dteTarget, (target) => {
     let dteNum = Number.parseInt(target, 10);
     let requireMonthly = target[target.length - 1] === 'M';
     return {
@@ -67,17 +76,17 @@ export function closestAfterDte(
 
   debug(closestDte);
 
-  _.each(dates, (strikeMap, key) => {
+  each(dates, (strikeMap, key) => {
     let [expirationDate, dteStr] = key.split(':');
     let dte = +dteStr;
     let isMonthly = false;
-    _.each(strikeMap, (contract) => {
+    each(strikeMap, (contract) => {
       let desc = contract[0].description || '';
       isMonthly = !desc.endsWith('(Weekly)');
       return false;
     });
 
-    _.each(closestDte, (d) => {
+    each(closestDte, (d) => {
       if (d.requireMonthly && !isMonthly) {
         return;
       }
@@ -106,12 +115,12 @@ export function analyzeSide(
   config: AnalyzeSideOptions,
   allExpirations: ExpirationDateMap
 ) {
-  if (_.isEmpty(allExpirations)) {
+  if (isEmpty(allExpirations)) {
     return [];
   }
 
   let expirations = closestAfterDte(allExpirations, config.dte);
-  let result = _.map(expirations, (expiration) => {
+  let result = map(expirations, (expiration) => {
     let deltas = closestDeltas(expiration.strikes, config.delta);
     return {
       deltas,
@@ -168,32 +177,29 @@ export function analyzeLiquidity(
   let puts = analyzeSide(config, chain.putExpDateMap);
 
   let allData = calls.concat(puts);
-  let results = _.flatMap(allData, (expiration) => {
-    return _.chain(expiration.deltas)
-      .map((delta) => {
-        let contract = delta.contract;
-        return {
-          expiration: expiration.expiration,
-          targetDte: expiration.target,
-          targetDelta: delta.target,
-          spreadPercent: contract.bid
-            ? (contract.ask / contract.bid - 1) * 100
-            : 1000,
-          ..._.pick(contract, [
-            'symbol',
-            'delta',
-            'putCall',
-            'strikePrice',
-            'daysToExpiration',
-            'bid',
-            'ask',
-            'totalVolume',
-            'openInterest',
-          ]),
-        };
-      })
-      .filter((data) => filterLiquidity(config, data))
-      .value();
+  let results = flatMap(allData, (expiration) => {
+    return map(expiration.deltas, (delta) => {
+      let contract = delta.contract;
+      return {
+        expiration: expiration.expiration,
+        targetDte: expiration.target,
+        targetDelta: delta.target,
+        spreadPercent: contract.bid
+          ? (contract.ask / contract.bid - 1) * 100
+          : 1000,
+        ...pick(contract, [
+          'symbol',
+          'delta',
+          'putCall',
+          'strikePrice',
+          'daysToExpiration',
+          'bid',
+          'ask',
+          'totalVolume',
+          'openInterest',
+        ]),
+      };
+    }).filter((data) => filterLiquidity(config, data));
   });
 
   debug('Results', chain.symbol, results);
