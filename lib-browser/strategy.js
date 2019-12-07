@@ -1,5 +1,5 @@
 import { optionInfoFromLeg } from './types';
-import _ from 'lodash';
+import sortBy from 'lodash/sortBy';
 export function isShort(leg) {
   return leg.size < 0;
 }
@@ -141,18 +141,14 @@ export const sameExpDescribers = {
   }
 };
 export function classify(legs) {
-  let optionInfos = _.map(legs, optionInfoFromLeg);
-
-  let orderedLegs = _.sortBy(optionInfos, ['strike', 'call', 'expiration']);
-
+  let optionInfos = legs.map(optionInfoFromLeg);
+  let orderedLegs = sortBy(optionInfos, ['strike', 'call', 'expiration']);
   let score = calculateComboScore(orderedLegs);
   let expiration = optionInfos[0].expiration;
   let size = optionInfos[0].size;
   let otherLegs = optionInfos.slice(1);
-
-  let allSameExpiration = _.every(otherLegs, leg => leg.expiration === expiration);
-
-  let allSameSize = _.every(otherLegs, leg => leg.size === size);
+  let allSameExpiration = otherLegs.every(leg => leg.expiration === expiration);
+  let allSameSize = otherLegs.every(leg => leg.size === size);
 
   if (!allSameExpiration || !allSameSize) {
     // Different expirations or sizes. Look for calendars, ratios, etc.

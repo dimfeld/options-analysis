@@ -1,7 +1,7 @@
-import _ from 'lodash';
+import { Dictionary } from 'lodash';
 import { ContractInfo } from 'tda-api';
-export declare type StrikeMap = _.Dictionary<ContractInfo[]>;
-export declare type ExpirationDateMap = _.Dictionary<StrikeMap>;
+export declare type StrikeMap = Dictionary<ContractInfo[]>;
+export declare type ExpirationDateMap = Dictionary<StrikeMap>;
 export declare function closestDeltas(strikes: StrikeMap, deltas: number[]): {
     target: number;
     contract: ContractInfo;

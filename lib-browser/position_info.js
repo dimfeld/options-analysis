@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import sum from 'lodash/sum';
+import map from 'lodash/map';
 export default function positionInfo(position, fetchQuote) {
   let openTotalBasis = 0;
   let maxTotalBasis = 0;
@@ -50,11 +51,8 @@ export default function positionInfo(position, fetchQuote) {
     let multiplier = leg.symbol.length > 6 ? 100 : 1;
     return leg.size * legPrice * multiplier;
   });
-
-  let openValue = _.sum(currentLegValues);
-
-  let totalRealized = _.sum(_.map(legData, leg => leg.realized));
-
+  let openValue = sum(currentLegValues);
+  let totalRealized = sum(map(legData, leg => leg.realized));
   let unrealized = openValue - openTotalBasis;
   let openPlPct = openTotalBasis === 0 ? 0 : 100 * unrealized / Math.abs(openTotalBasis);
   let totalPlPct = 100 * (unrealized + totalRealized) / Math.abs(maxTotalBasis);
