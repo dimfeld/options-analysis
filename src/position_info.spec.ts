@@ -36,6 +36,17 @@ test('single long option', function() {
     openBasis: 200,
 
     netLiquidity: 300,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 200,
+        openLegs: 1,
+        openingIsLong: true,
+        realized: 0,
+        totalBasis: 200,
+      },
+    },
   });
 });
 
@@ -63,6 +74,17 @@ test('single short option', function() {
     openBasis: -200,
 
     netLiquidity: -300,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: -200,
+        openLegs: -1,
+        openingIsLong: false,
+        realized: 0,
+        totalBasis: -200,
+      },
+    },
   });
 });
 
@@ -96,6 +118,26 @@ test('losing credit spread', function() {
     openBasis: -100,
 
     netLiquidity: -150,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 100,
+        openLegs: 1,
+        openingIsLong: true,
+        realized: 0,
+        totalBasis: 100,
+      },
+      'ANET  171020P00190000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: -200,
+        openLegs: -1,
+        openingIsLong: false,
+        realized: 0,
+        totalBasis: -200,
+      },
+    },
   });
 });
 
@@ -129,6 +171,26 @@ test('winning credit spread', function() {
     openBasis: -200,
 
     netLiquidity: -150,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 400,
+        openLegs: 1,
+        openingIsLong: true,
+        realized: 0,
+        totalBasis: 400,
+      },
+      'ANET  171020P00190000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: -600,
+        openLegs: -1,
+        openingIsLong: false,
+        realized: 0,
+        totalBasis: -600,
+      },
+    },
   });
 });
 
@@ -162,6 +224,26 @@ test('winning debit spread', function() {
     openBasis: 100,
 
     netLiquidity: 150,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: -100,
+        openLegs: -1,
+        openingIsLong: false,
+        realized: 0,
+        totalBasis: -100,
+      },
+      'ANET  171020P00190000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 200,
+        openLegs: 1,
+        openingIsLong: true,
+        realized: 0,
+        totalBasis: 200,
+      },
+    },
   });
 });
 
@@ -195,6 +277,27 @@ test('losing debit spread', function() {
     openBasis: 200,
 
     netLiquidity: 150,
+
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: -400,
+        openLegs: -1,
+        openingIsLong: false,
+        realized: 0,
+        totalBasis: -400,
+      },
+      'ANET  171020P00190000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 600,
+        openLegs: 1,
+        openingIsLong: true,
+        realized: 0,
+        totalBasis: 600,
+      },
+    },
   });
 });
 
@@ -227,6 +330,17 @@ test('closed single long option', function() {
     openBasis: 0,
 
     netLiquidity: 0,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: true,
+        realized: 100,
+        totalBasis: 200,
+      },
+    },
   });
 });
 
@@ -260,6 +374,17 @@ test('closed single short option', function() {
     openBasis: 0,
 
     netLiquidity: 0,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: false,
+        realized: -100,
+        totalBasis: -200,
+      },
+    },
   });
 });
 
@@ -299,6 +424,26 @@ test('closed losing credit spread', function() {
     openBasis: 0,
 
     netLiquidity: 0,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: true,
+        realized: 50,
+        totalBasis: 100,
+      },
+      'ANET  171020P00190000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: false,
+        realized: -75,
+        totalBasis: -200,
+      },
+    },
   });
 });
 
@@ -338,6 +483,26 @@ test('closed winning credit spread', function() {
     openBasis: 0,
 
     netLiquidity: 0,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: true,
+        realized: -350,
+        totalBasis: 400,
+      },
+      'ANET  171020P00190000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: false,
+        realized: 500,
+        totalBasis: -600,
+      },
+    },
   });
 });
 
@@ -376,6 +541,26 @@ test('closed winning debit spread', function() {
     openBasis: 0,
 
     netLiquidity: 0,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: false,
+        realized: -100,
+        totalBasis: -100,
+      },
+      'ANET  171020P00190000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: true,
+        realized: 500,
+        totalBasis: 200,
+      },
+    },
   });
 });
 
@@ -414,6 +599,26 @@ test('closed losing debit spread', function() {
     openBasis: 0,
 
     netLiquidity: 0,
+    legData: {
+      'ANET  171020P00180000': {
+        maxLegs: -1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: false,
+        realized: 390,
+        totalBasis: -400,
+      },
+      'ANET  171020P00190000': {
+        maxLegs: 1,
+        multiplier: 100,
+        openBasis: 0,
+        openLegs: 0,
+        openingIsLong: true,
+        realized: -570,
+        totalBasis: 600,
+      },
+    },
   });
 });
 

@@ -1,23 +1,16 @@
 import { Dictionary } from 'lodash';
 import sum from 'lodash/sum';
 import map from 'lodash/map';
-import { Position, Trade } from './types';
+import { Position, Trade, PositionLegInfo } from './types';
 
 export default function positionInfo<T extends Position<TR>, TR extends Trade>(
   position: T,
   fetchQuote: (symbol: string) => number | null
 ) {
-  interface LegData {
-    openingIsLong: boolean;
-    openBasis: number;
-    openLegs: number;
-    realized: number;
-  }
-
   let openTotalBasis = 0;
   let maxTotalBasis = 0;
 
-  let legData: Dictionary<LegData> = {};
+  let legData: Dictionary<PositionLegInfo> = {};
 
   position.trades.forEach((trade) => {
     trade.legs.forEach((leg) => {
@@ -27,17 +20,20 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
         data = legData[leg.symbol] = {
           openingIsLong: thisLong,
           openLegs: 0,
+          maxLegs: 0,
+          totalBasis: 0,
           openBasis: 0,
           realized: 0,
+          multiplier: leg.symbol.length > 6 ? 100 : 1,
         };
       }
 
-      let multiplier = leg.symbol.length > 6 ? 100 : 1;
-      let value = leg.size * leg.price * multiplier;
+      let value = leg.size * leg.price * data.multiplier;
 
       // If this leg was opened in the same direction as the
       // original leg (or it's the first) then add it to the basis.
       if (thisLong === data.openingIsLong) {
+        data.maxLegs += leg.size;
         data.openBasis += value;
         openTotalBasis += value;
       } else {
@@ -48,6 +44,10 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
 
         let realized = -1 * (value + theseLegsBasis);
         data.realized += realized;
+      }
+
+      if (Math.abs(data.openBasis) > Math.abs(data.totalBasis)) {
+        data.totalBasis = data.openBasis;
       }
 
       data.openLegs += leg.size;
@@ -91,5 +91,7 @@ export default function positionInfo<T extends Position<TR>, TR extends Trade>(
     openBasis: openTotalBasis,
 
     netLiquidity: openValue,
+
+    legData,
   };
 }

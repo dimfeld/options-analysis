@@ -15,6 +15,16 @@ export interface Trade {
   legs: TradeLeg[];
 }
 
+export interface PositionLegInfo {
+  openingIsLong: boolean;
+  totalBasis: number;
+  maxLegs: number;
+  openBasis: number;
+  openLegs: number;
+  realized: number;
+  multiplier: number;
+}
+
 export interface Position<T extends Trade> {
   symbol: string;
   legs: OptionLeg[];
