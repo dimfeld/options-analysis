@@ -13,16 +13,19 @@ export default function positionInfo(position, fetchQuote) {
         data = legData[leg.symbol] = {
           openingIsLong: thisLong,
           openLegs: 0,
+          maxLegs: 0,
+          totalBasis: 0,
           openBasis: 0,
-          realized: 0
+          realized: 0,
+          multiplier: leg.symbol.length > 6 ? 100 : 1
         };
       }
 
-      let multiplier = leg.symbol.length > 6 ? 100 : 1;
-      let value = leg.size * leg.price * multiplier; // If this leg was opened in the same direction as the
+      let value = leg.size * leg.price * data.multiplier; // If this leg was opened in the same direction as the
       // original leg (or it's the first) then add it to the basis.
 
       if (thisLong === data.openingIsLong) {
+        data.maxLegs += leg.size;
         data.openBasis += value;
         openTotalBasis += value;
       } else {
@@ -31,6 +34,10 @@ export default function positionInfo(position, fetchQuote) {
         openTotalBasis -= theseLegsBasis;
         let realized = -1 * (value + theseLegsBasis);
         data.realized += realized;
+      }
+
+      if (Math.abs(data.openBasis) > Math.abs(data.totalBasis)) {
+        data.totalBasis = data.openBasis;
       }
 
       data.openLegs += leg.size;
@@ -64,7 +71,8 @@ export default function positionInfo(position, fetchQuote) {
     openPlPct,
     unrealized,
     openBasis: openTotalBasis,
-    netLiquidity: openValue
+    netLiquidity: openValue,
+    legData
   };
 }
 //# sourceMappingURL=position_info.js.map
