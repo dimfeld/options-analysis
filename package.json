@@ -1,6 +1,6 @@
 {
   "name": "options-analysis",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Utilities for analyzing option strategies",
   "main": "lib/index.js",
   "module": "lib-browser/index.js",
