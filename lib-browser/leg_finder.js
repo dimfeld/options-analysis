@@ -1,9 +1,9 @@
 import each from 'lodash/each';
-import map from 'lodash/map';
-import pick from 'lodash/pick';
-import flatMap from 'lodash/flatMap';
 import isEmpty from 'lodash/isEmpty';
+import flatMap from 'lodash/flatMap';
+import map from 'lodash/map';
 import orderBy from 'lodash/orderBy';
+import pick from 'lodash/pick';
 import sortedIndexBy from 'lodash/sortedIndexBy';
 import debugMod from 'debug';
 const debug = debugMod('option_finder');
@@ -23,12 +23,13 @@ export function closestDeltas(strikes, deltas) {
     let index = sortedIndexBy(sorted, {
       delta: targetDelta
     }, x => Math.abs(x.delta));
-    let greaterDistance = index < sorted.length ? Math.abs(sorted[index].delta - targetDelta) : Infinity;
-    let lesserDistance = index > 0 ? Math.abs(sorted[index - 1].delta - targetDelta) : Infinity;
+    let greaterDistance = index < sorted.length ? Math.abs(sorted[index].delta) - targetDelta : Infinity;
+    let lesserDistance = index > 0 ? Math.abs(sorted[index - 1].delta) - targetDelta : Infinity;
     let best = greaterDistance < lesserDistance ? sorted[index] : sorted[index - 1];
     return {
       target: targetDelta,
-      contract: best
+      contract: best,
+      contracts: [sorted[index - 1], sorted[index]].filter(Boolean)
     };
   });
   return closest;
@@ -104,12 +105,12 @@ export function filterLiquidity(config, data) {
   return true;
 }
 export function analyzeLiquidity(config, chain) {
-  // debug("Analyzing", chain, typeof chain, "array", _.isArray(chain));
+  // debug("Analyzing", chain, typeof chain, "array", isArray(chain));
   let calls = analyzeSide(config, chain.callExpDateMap);
   let puts = analyzeSide(config, chain.putExpDateMap);
   let allData = calls.concat(puts);
   let results = flatMap(allData, expiration => {
-    return map(expiration.deltas, delta => {
+    return expiration.deltas.map(delta => {
       let contract = delta.contract;
       return {
         expiration: expiration.expiration,

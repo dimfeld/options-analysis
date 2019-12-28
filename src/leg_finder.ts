@@ -1,9 +1,9 @@
 import each from 'lodash/each';
-import map from 'lodash/map';
-import pick from 'lodash/pick';
-import flatMap from 'lodash/flatMap';
 import isEmpty from 'lodash/isEmpty';
+import flatMap from 'lodash/flatMap';
+import map from 'lodash/map';
 import orderBy from 'lodash/orderBy';
+import pick from 'lodash/pick';
 import sortedIndexBy from 'lodash/sortedIndexBy';
 import { Dictionary } from 'lodash';
 import debugMod from 'debug';
@@ -37,13 +37,18 @@ export function closestDeltas(strikes: StrikeMap, deltas: number[]) {
     );
     let greaterDistance =
       index < sorted.length
-        ? Math.abs(sorted[index].delta - targetDelta)
+        ? Math.abs(sorted[index].delta) - targetDelta
         : Infinity;
     let lesserDistance =
-      index > 0 ? Math.abs(sorted[index - 1].delta - targetDelta) : Infinity;
+      index > 0 ? Math.abs(sorted[index - 1].delta) - targetDelta : Infinity;
     let best =
       greaterDistance < lesserDistance ? sorted[index] : sorted[index - 1];
-    return { target: targetDelta, contract: best };
+
+    return {
+      target: targetDelta,
+      contract: best,
+      contracts: [sorted[index - 1], sorted[index]].filter(Boolean),
+    };
   });
 
   return closest;
@@ -172,34 +177,36 @@ export function analyzeLiquidity(
   config: AnalyzeSideOptions & FilterLiquidityArguments,
   chain: AnalyzeLiquidityOptions
 ) {
-  // debug("Analyzing", chain, typeof chain, "array", _.isArray(chain));
+  // debug("Analyzing", chain, typeof chain, "array", isArray(chain));
   let calls = analyzeSide(config, chain.callExpDateMap);
   let puts = analyzeSide(config, chain.putExpDateMap);
 
   let allData = calls.concat(puts);
   let results = flatMap(allData, (expiration) => {
-    return map(expiration.deltas, (delta) => {
-      let contract = delta.contract;
-      return {
-        expiration: expiration.expiration,
-        targetDte: expiration.target,
-        targetDelta: delta.target,
-        spreadPercent: contract.bid
-          ? (contract.ask / contract.bid - 1) * 100
-          : 1000,
-        ...pick(contract, [
-          'symbol',
-          'delta',
-          'putCall',
-          'strikePrice',
-          'daysToExpiration',
-          'bid',
-          'ask',
-          'totalVolume',
-          'openInterest',
-        ]),
-      };
-    }).filter((data) => filterLiquidity(config, data));
+    return expiration.deltas
+      .map((delta) => {
+        let contract = delta.contract;
+        return {
+          expiration: expiration.expiration,
+          targetDte: expiration.target,
+          targetDelta: delta.target,
+          spreadPercent: contract.bid
+            ? (contract.ask / contract.bid - 1) * 100
+            : 1000,
+          ...pick(contract, [
+            'symbol',
+            'delta',
+            'putCall',
+            'strikePrice',
+            'daysToExpiration',
+            'bid',
+            'ask',
+            'totalVolume',
+            'openInterest',
+          ]),
+        };
+      })
+      .filter((data) => filterLiquidity(config, data));
   });
 
   debug('Results', chain.symbol, results);

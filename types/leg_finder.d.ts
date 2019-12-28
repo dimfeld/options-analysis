@@ -5,6 +5,7 @@ export declare type ExpirationDateMap = Dictionary<StrikeMap>;
 export declare function closestDeltas(strikes: StrikeMap, deltas: number[]): {
     target: number;
     contract: ContractInfo;
+    contracts: ContractInfo[];
 }[];
 interface ClosestDte {
     target: number;
@@ -27,6 +28,7 @@ export declare function analyzeSide(config: AnalyzeSideOptions, allExpirations: 
     deltas: {
         target: number;
         contract: ContractInfo;
+        contracts: ContractInfo[];
     }[];
 }[];
 export interface FilterLiquidityArguments {
