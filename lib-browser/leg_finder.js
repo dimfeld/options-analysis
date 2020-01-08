@@ -24,7 +24,7 @@ export function closestDeltas(strikes, deltas) {
       delta: targetDelta
     }, x => Math.abs(x.delta));
     let greaterDistance = index < sorted.length ? Math.abs(sorted[index].delta) - targetDelta : Infinity;
-    let lesserDistance = index > 0 ? Math.abs(sorted[index - 1].delta) - targetDelta : Infinity;
+    let lesserDistance = index > 0 ? targetDelta - Math.abs(sorted[index - 1].delta) : Infinity;
     let best = greaterDistance < lesserDistance ? sorted[index] : sorted[index - 1];
     return {
       target: targetDelta,
